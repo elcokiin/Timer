@@ -1,4 +1,4 @@
-import type { AppState, HistoryEntry } from "./types.js";
+import type { AppState, CustomAlarm, HistoryEntry } from "./types.js";
 
 interface Prefs {
   alarm?: string;
@@ -93,6 +93,19 @@ export async function idbDel(k: string): Promise<void> {
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
   });
+}
+
+const ALARM_LIBRARY_KEY = "ff_alarm_library";
+
+export async function saveAlarmLibraryRaw(alarms: CustomAlarm[]): Promise<void> {
+  await idbSet(ALARM_LIBRARY_KEY, JSON.stringify(alarms));
+}
+
+export async function loadAlarmLibraryRaw(): Promise<CustomAlarm[]> {
+  const raw = await idbGet(ALARM_LIBRARY_KEY);
+  if (!raw) return [];
+  const parsed = parseJson<CustomAlarm[]>(raw, []);
+  return Array.isArray(parsed) ? parsed : [];
 }
 
 export function fileToDataURL(file: File): Promise<string> {

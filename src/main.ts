@@ -4,7 +4,18 @@ import { setupKeyboard } from "./keyboard.js";
 import { ensureHistoryModule as ensureHistoryModuleLazy, getHistoryApi, playAlarmLazy, preloadHistory } from "./lazyModules.js";
 import { createRing } from "./ring.js";
 import { EDITABLE_TIME_POS, state } from "./state.js";
-import { addHistoryRaw, fileToDataURL, idbDel, idbGet, idbSet, loadPrefs, savePrefs } from "./storage.js";
+import { stripFileExtension, trimAlarmToAudibleThreeSeconds } from "./audioTrim.js";
+import {
+  addHistoryRaw,
+  fileToDataURL,
+  idbDel,
+  idbGet,
+  idbSet,
+  loadAlarmLibraryRaw,
+  loadPrefs,
+  saveAlarmLibraryRaw,
+  savePrefs,
+} from "./storage.js";
 import { createTimerCore } from "./timerCore.js";
 import { createUiBindings } from "./uiBindings.js";
 import type { UiApi } from "./uiBindings.js";
@@ -14,6 +25,11 @@ const dom = getDomRefs();
 const ring = createRing(state, dom);
 
 let ui: UiApi;
+
+function createAlarmId(): string {
+  if ("randomUUID" in crypto) return crypto.randomUUID();
+  return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+}
 
 const onApplyDuration = (secs: number): void => {
   if (state.status !== "idle" || secs <= 0) return;
@@ -55,11 +71,17 @@ ui = createUiBindings({
     await idbDel("ff_bg");
   },
   onAlarmPick: async (file) => {
-    const url = await fileToDataURL(file);
-    state.customAlarmBlob = url;
-    state.alarmChoice = "custom";
-    await idbSet("ff_alarm_blob", url);
-    document.querySelectorAll<HTMLElement>(".alarm-chip").forEach((c) => c.classList.remove("active"));
+    const url = await trimAlarmToAudibleThreeSeconds(file);
+    const id = createAlarmId();
+    const name = stripFileExtension(file.name);
+    state.customAlarms.push({ id, name, blob: url });
+    state.alarmChoice = `custom:${id}`;
+    await saveAlarmLibraryRaw(state.customAlarms);
+    savePrefs(state);
+  },
+  onDeleteCustomAlarm: async () => {
+    await saveAlarmLibraryRaw(state.customAlarms);
+    savePrefs(state);
   },
   onApplyDefaults: (focusMinutes, breakMinutes) => {
     if (state.status !== "idle") return;
@@ -131,6 +153,7 @@ async function init(): Promise<void> {
     onToggleTimeEdit: () => ui.toggleTimeEdit(),
     onToggleShowRing: () => ui.toggleShowRing(),
     onOpenAdvanced: () => ui.openAdvanced(),
+    onDeleteFocusedCustomAlarm: () => ui.deleteFocusedCustomAlarm(),
   });
 
   try {
@@ -145,14 +168,16 @@ async function init(): Promise<void> {
   }
 
   try {
-    const blob = await idbGet("ff_alarm_blob");
-    if (blob) {
-      state.customAlarmBlob = blob;
-      state.alarmChoice = "custom";
-    }
+    state.customAlarms = await loadAlarmLibraryRaw();
   } catch {
-    // ignore missing alarm blob
+    state.customAlarms = [];
   }
+
+  const selectedCustomId = state.alarmChoice.startsWith("custom:") ? state.alarmChoice.slice("custom:".length) : "";
+  if (selectedCustomId && !state.customAlarms.some((item) => item.id === selectedCustomId)) {
+    state.alarmChoice = "bell";
+  }
+  ui.syncPrefsInputs();
 
   if ("requestIdleCallback" in window) {
     (window as Window & { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => void }).requestIdleCallback(

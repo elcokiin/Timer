@@ -162,6 +162,10 @@ export function setupKeyboard(deps) {
             event.preventDefault();
             return historyApi.deleteFocusedItem();
         }
+        if (lower === "d" && kind === "settings") {
+            event.preventDefault();
+            return deps.onDeleteFocusedCustomAlarm();
+        }
         const isActivateKey = key === "Enter" || key === " " || key === "Spacebar" || event.code === "Space";
         if (isActivateKey && active?.matches('[data-menu-item="true"]')) {
             event.preventDefault();
@@ -203,7 +207,8 @@ export function setupKeyboard(deps) {
             e.key === " " ||
             e.key === "Spacebar" ||
             e.code === "Space";
-        if (deps.hasTypingFocus(e.target) && !(menu && !e.repeat && isMenuNavKey))
+        const allowInTypingFocus = lowerKey === "i" && deps.state.status === "idle" && !menu && !e.repeat;
+        if (deps.hasTypingFocus(e.target) && !(menu && !e.repeat && isMenuNavKey) && !allowInTypingFocus)
             return;
         if (menu && !e.repeat) {
             if (e.key === "Escape") {

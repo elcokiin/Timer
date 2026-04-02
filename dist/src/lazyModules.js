@@ -29,9 +29,14 @@ export async function preloadHistory(ctx) {
     }
 }
 export async function playAlarmLazy(state) {
-    if (state.customAlarmBlob) {
-        void new Audio(state.customAlarmBlob).play().catch(() => { });
-        return;
+    if (state.alarmChoice.startsWith("custom:")) {
+        const customId = state.alarmChoice.slice("custom:".length);
+        const item = state.customAlarms.find((alarm) => alarm.id === customId);
+        if (item?.blob) {
+            void new Audio(item.blob).play().catch(() => { });
+            return;
+        }
+        state.alarmChoice = "bell";
     }
     if (!audioPromise) {
         audioPromise = import("./audioEngine.js");

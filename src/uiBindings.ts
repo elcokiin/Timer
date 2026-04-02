@@ -16,6 +16,7 @@ interface UiDeps {
   onBackgroundPick: (file: File) => Promise<void>;
   onBackgroundReset: () => Promise<void>;
   onAlarmPick: (file: File) => Promise<void>;
+  onDeleteCustomAlarm: () => Promise<void>;
   onApplyDefaults: (focusMinutes: number, breakMinutes: number) => void;
 }
 
@@ -36,11 +37,55 @@ export interface UiApi {
   syncPrefsInputs: () => void;
   bindUiEvents: () => void;
   toggleShowRing: () => void;
+  deleteFocusedCustomAlarm: () => boolean;
 }
 
 export function createUiBindings(deps: UiDeps): UiApi {
   const { state, dom, ring } = deps;
   let advancedReturnFocus: HTMLElement | null = null;
+
+  function renderAlarmCustomChips(): void {
+    dom.alarmGrid.querySelectorAll(".alarm-chip--custom").forEach((node) => node.remove());
+
+    state.customAlarms.forEach((alarm) => {
+      const chip = document.createElement("span");
+      chip.className = "alarm-chip alarm-chip--custom";
+      chip.dataset.alarm = `custom:${alarm.id}`;
+      chip.dataset.customId = alarm.id;
+      const labelWrap = document.createElement("span");
+      labelWrap.className = "alarm-chip-label-wrap";
+      const label = document.createElement("span");
+      label.className = "alarm-chip-label";
+      label.textContent = alarm.name;
+      labelWrap.appendChild(label);
+
+      const del = document.createElement("button");
+      del.className = "alarm-chip-del";
+      del.type = "button";
+      del.textContent = "x";
+      del.setAttribute("aria-label", `Delete ${alarm.name}`);
+
+      chip.appendChild(labelWrap);
+      chip.appendChild(del);
+      dom.alarmGrid.appendChild(chip);
+    });
+  }
+
+  function syncAlarmChipMarquee(): void {
+    const chips = dom.alarmGrid.querySelectorAll<HTMLElement>(".alarm-chip--custom");
+    chips.forEach((chip) => {
+      const wrap = chip.querySelector<HTMLElement>(".alarm-chip-label-wrap");
+      const label = chip.querySelector<HTMLElement>(".alarm-chip-label");
+      if (!wrap || !label) return;
+      chip.classList.remove("alarm-chip--marquee");
+      label.style.removeProperty("--alarm-marquee-duration");
+      const overflow = label.scrollWidth - wrap.clientWidth;
+      if (overflow <= 4) return;
+      const duration = Math.max(5, Math.min(14, overflow / 14 + 4));
+      chip.classList.add("alarm-chip--marquee");
+      label.style.setProperty("--alarm-marquee-duration", `${duration}s`);
+    });
+  }
 
   function updateThemeCards() {
     const cards = dom.advancedThemeCards.querySelectorAll<HTMLElement>("[data-theme-card]");
@@ -315,14 +360,41 @@ export function createUiBindings(deps: UiDeps): UiApi {
     });
   }
 
+  function setActiveAlarmChip(choice: string): void {
+    dom.alarmGrid
+      .querySelectorAll<HTMLElement>(".alarm-chip")
+      .forEach((c) => c.classList.toggle("active", c.dataset.alarm === choice));
+  }
+
+  async function deleteCustomAlarmById(id: string): Promise<void> {
+    const index = state.customAlarms.findIndex((item) => item.id === id);
+    if (index < 0) return;
+    const wasActive = state.alarmChoice === `custom:${id}`;
+    state.customAlarms.splice(index, 1);
+    if (wasActive) state.alarmChoice = "bell";
+    await deps.onDeleteCustomAlarm();
+    syncPrefsInputs();
+  }
+
+  function deleteFocusedCustomAlarm(): boolean {
+    const active = document.activeElement as HTMLElement | null;
+    const chip = active?.closest<HTMLElement>(".alarm-chip--custom") ?? null;
+    if (!chip) return false;
+    const id = chip.dataset.customId;
+    if (!id) return false;
+    void deleteCustomAlarmById(id);
+    return true;
+  }
+
   function syncPrefsInputs() {
     dom.defFocus.value = String(Math.round(state.lastFocus / 60));
     dom.defBreak.value = String(Math.round(state.lastBreak / 60));
     updateThemeCards();
     dom.advancedShowRing.checked = state.showRing;
-    document
-      .querySelectorAll<HTMLElement>(".alarm-chip")
-      .forEach((c) => c.classList.toggle("active", c.dataset.alarm === state.alarmChoice));
+    renderAlarmCustomChips();
+    markSettingsMenuItems();
+    setActiveAlarmChip(state.alarmChoice);
+    requestAnimationFrame(syncAlarmChipMarquee);
   }
 
   function bindUiEvents() {
@@ -449,15 +521,25 @@ export function createUiBindings(deps: UiDeps): UiApi {
       const file = dom.alarmInput.files?.[0];
       if (!file) return;
       await deps.onAlarmPick(file);
+      dom.alarmInput.value = "";
+      syncPrefsInputs();
     });
 
     dom.alarmGrid.addEventListener("click", (e) => {
+      const del = (e.target as Element | null)?.closest(".alarm-chip-del") as HTMLButtonElement | null;
+      if (del) {
+        e.preventDefault();
+        e.stopPropagation();
+        const chip = del.closest(".alarm-chip--custom") as HTMLElement | null;
+        const id = chip?.dataset.customId;
+        if (id) void deleteCustomAlarmById(id);
+        return;
+      }
+
       const chip = (e.target as Element | null)?.closest(".alarm-chip") as HTMLElement | null;
       if (!chip) return;
-      document.querySelectorAll<HTMLElement>(".alarm-chip").forEach((x) => x.classList.remove("active"));
-      chip.classList.add("active");
       state.alarmChoice = chip.dataset.alarm ?? "bell";
-      state.customAlarmBlob = null;
+      setActiveAlarmChip(state.alarmChoice);
       deps.onSavePrefs();
     });
 
@@ -523,5 +605,6 @@ export function createUiBindings(deps: UiDeps): UiApi {
     syncPrefsInputs,
     bindUiEvents,
     toggleShowRing,
+    deleteFocusedCustomAlarm,
   };
 }

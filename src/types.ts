@@ -1,6 +1,12 @@
 export type Phase = "focus" | "break";
 export type TimerStatus = "idle" | "running" | "paused";
 
+export interface CustomAlarm {
+  id: string;
+  name: string;
+  blob: string;
+}
+
 export interface AppState {
   phase: Phase;
   status: TimerStatus;
@@ -11,7 +17,7 @@ export interface AppState {
   lastFocus: number;
   lastBreak: number;
   alarmChoice: string;
-  customAlarmBlob: string | null;
+  customAlarms: CustomAlarm[];
   interval: ReturnType<typeof setInterval> | null;
 }
 

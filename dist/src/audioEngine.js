@@ -1,7 +1,9 @@
 let audioCtx = null;
 function getCtx() {
     if (!audioCtx) {
-        const Ctx = window.AudioContext || window.webkitAudioContext;
+        const Ctx = window.AudioContext ||
+            window
+                .webkitAudioContext;
         if (!Ctx) {
             throw new Error("Web Audio API is not supported in this browser.");
         }

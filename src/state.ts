@@ -10,7 +10,7 @@ export const state: AppState = {
   lastFocus: 25 * 60,
   lastBreak: 5 * 60,
   alarmChoice: "bell",
-  customAlarmBlob: null,
+  customAlarms: [],
   interval: null,
 };
 

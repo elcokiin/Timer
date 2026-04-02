@@ -77,6 +77,17 @@ export async function idbDel(k) {
         tx.onerror = () => reject(tx.error);
     });
 }
+const ALARM_LIBRARY_KEY = "ff_alarm_library";
+export async function saveAlarmLibraryRaw(alarms) {
+    await idbSet(ALARM_LIBRARY_KEY, JSON.stringify(alarms));
+}
+export async function loadAlarmLibraryRaw() {
+    const raw = await idbGet(ALARM_LIBRARY_KEY);
+    if (!raw)
+        return [];
+    const parsed = parseJson(raw, []);
+    return Array.isArray(parsed) ? parsed : [];
+}
 export function fileToDataURL(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
