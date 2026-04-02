@@ -158,7 +158,12 @@ export function setupKeyboard(deps) {
             gPendingUntil = now + 420;
             return true;
         }
-        if (key === "Enter" && active?.matches('[data-menu-item="true"]')) {
+        if (lower === "d" && kind === "history" && historyApi) {
+            event.preventDefault();
+            return historyApi.deleteFocusedItem();
+        }
+        const isActivateKey = key === "Enter" || key === " " || key === "Spacebar" || event.code === "Space";
+        if (isActivateKey && active?.matches('[data-menu-item="true"]')) {
             event.preventDefault();
             active.click();
             return true;
@@ -168,6 +173,23 @@ export function setupKeyboard(deps) {
     document.addEventListener("keydown", async (e) => {
         if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey)
             return;
+        if (deps.isAdvancedOpen()) {
+            const lower = e.key.toLowerCase();
+            if (lower === "r" && !e.repeat) {
+                e.preventDefault();
+                deps.onToggleShowRing();
+                return;
+            }
+            if (lower === "e" && !e.repeat) {
+                e.preventDefault();
+                deps.closeAdvanced();
+                return;
+            }
+            if (e.key === "Escape") {
+                deps.closeAdvanced();
+            }
+            return;
+        }
         const menu = activeMenu();
         const lowerKey = e.key.toLowerCase();
         const isMenuNavKey = lowerKey === "h" ||
@@ -175,8 +197,12 @@ export function setupKeyboard(deps) {
             lowerKey === "k" ||
             lowerKey === "l" ||
             lowerKey === "g" ||
+            lowerKey === "d" ||
             e.key === "G" ||
-            e.key === "Enter";
+            e.key === "Enter" ||
+            e.key === " " ||
+            e.key === "Spacebar" ||
+            e.code === "Space";
         if (deps.hasTypingFocus(e.target) && !(menu && !e.repeat && isMenuNavKey))
             return;
         if (menu && !e.repeat) {
@@ -208,7 +234,17 @@ export function setupKeyboard(deps) {
         }
         if (key === "i" && deps.state.status === "idle" && !menu && !e.repeat) {
             e.preventDefault();
-            deps.onInsertEdit();
+            deps.onToggleTimeEdit();
+            return;
+        }
+        if (key === "r" && !e.repeat) {
+            e.preventDefault();
+            deps.onToggleShowRing();
+            return;
+        }
+        if (key === "e" && !e.repeat) {
+            e.preventDefault();
+            deps.onOpenAdvanced();
             return;
         }
         if (e.key === "H") {
@@ -224,6 +260,7 @@ export function setupKeyboard(deps) {
         if (e.key === "Escape") {
             deps.closeSettings();
             deps.closeHistory();
+            deps.closeAdvanced();
         }
     });
 }

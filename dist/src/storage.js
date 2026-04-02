@@ -22,12 +22,18 @@ export function savePrefs(state) {
         alarm: state.alarmChoice,
         lastFocus: state.lastFocus,
         lastBreak: state.lastBreak,
+        theme: state.theme,
+        showRing: state.showRing,
     }));
 }
 export function loadPrefs(state) {
     const p = parseJson(localStorage.getItem("ff_prefs"), {});
     if (p.alarm)
         state.alarmChoice = p.alarm;
+    if (p.theme)
+        state.theme = p.theme;
+    if (typeof p.showRing === "boolean")
+        state.showRing = p.showRing;
     if (p.lastFocus) {
         state.lastFocus = p.lastFocus;
         state.totalSeconds = p.lastFocus;

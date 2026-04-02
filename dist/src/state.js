@@ -1,6 +1,8 @@
 export const state = {
     phase: "focus",
     status: "idle",
+    theme: "forest",
+    showRing: true,
     totalSeconds: 25 * 60,
     remaining: 25 * 60,
     lastFocus: 25 * 60,

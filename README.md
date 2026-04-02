@@ -1,70 +1,74 @@
 # FocusFlow PWA
 
-Temporizador tipo Pomodoro en una sola pagina (`index.html`), con historial, configuracion de fondo/alarma y modo offline via Service Worker.
+Single-page Pomodoro timer (`index.html`) with history, background/alarm customization, and offline mode via Service Worker.
 
-## Uso rapido
+## Quick Start
 
-- Instala dependencias: `npm install`
-- Compila TypeScript: `npm run build`
-- Sirve con un servidor local (por ejemplo `npx serve .`).
-- Abre la URL local y no el archivo directamente para validar PWA/offline.
+- Install dependencies: `npm install`
+- Compile TypeScript: `npm run build`
+- Serve with a local server (for example `npx serve .`)
+- Open the local URL (not the file directly) to validate PWA/offline behavior
 
 ## Build TypeScript
 
-- `npm run build`: compila `src/**/*.ts` a `dist/src/*.js` y `sw.ts` a `sw.js`.
-- `npm run typecheck`: chequeo estricto de tipos para la app.
+- `npm run build`: compiles `src/**/*.ts` to `dist/src/*.js` and `sw.ts` to `sw.js`
+- `npm run typecheck`: strict type checking for the app
 
-## Atajos de teclado
+## Keyboard Shortcuts
 
-- `Space` o `Enter`: alterna entre iniciar, pausar y reanudar el temporizador.
-- `S`: detener el temporizador (cuando esta en ejecucion o pausa).
-- `Shift+H`: abrir/cerrar el panel de historial.
-- `,` o `P`: abrir/cerrar el panel de configuracion.
-- `Esc`: cerrar paneles abiertos.
+- `Space` or `Enter`: toggle start, pause, and resume timer
+- `s`: stop the timer (while running or paused)
+- `i`: toggle timer time edit mode (idle only)
+- `Shift+H`: open/close the history panel
+- `,` or `p`: open/close the settings panel
+- `e`: toggle advanced settings (open/close)
+- `r`: show/hide the animated ring (global)
+- `Esc`: close open panels
 
-Navegacion en menus abiertos (vim-style):
+Vim-style navigation in open menus:
 
-- `j` / `k`: mover foco abajo/arriba.
-- `G`: ir al final.
-- `gg`: ir al inicio.
-- En historial: `h` / `l` cambia de dia seleccionado.
-- `Enter`: activa elemento enfocado (tab, bloque o sesion).
+- `j` / `k`: move focus down/up
+- `G`: jump to bottom
+- `gg`: jump to top
+- In history: `h` / `l` changes selected day
+- In advanced settings modal: `h` / `l` moves across cards and `j` / `k` moves up/down rows
+- `Enter`: activate focused item (tab, block, or session)
 
-## Historial
+## History
 
-- Boton `Borrar` en la cabecera del panel lateral para limpiar todo el historial.
-- El historial ahora se agrupa por dias (tabs).
-- Cada dia muestra bloques `Morning`, `Afternoon`, `Evening`.
-- Solo se contabiliza tiempo de `focus` para los totales diarios y de bloque.
-- Click o `Enter` sobre una sesion de focus aplica esa duracion al temporizador.
+- `Clear` button in the side panel header removes all history
+- History is grouped by days (tabs)
+- Each day shows `Morning`, `Afternoon`, `Evening` blocks
+- Only `focus` time is counted for day/block totals
+- Click or `Enter` on a focus session applies that duration to the timer
 
-Notas de comportamiento:
+Behavior notes:
 
-- Los atajos no se disparan mientras escribes en `input`, `textarea`, `select` o elementos `contenteditable`.
-- `Space` y `Enter` no interceptan la interaccion normal cuando el foco esta en botones/enlaces.
+- Shortcuts do not trigger while typing in `input`, `textarea`, `select`, or `contenteditable` elements
+- `Space` and `Enter` do not override normal interaction when focus is on buttons/links
 
-## Ajuste del panel derecho (historial)
+## Right Panel (History)
 
-Se corrigio el posicionamiento del menu lateral derecho para evitar que el tab/panel se vea desalineado o montado:
+The right side panel positioning was adjusted to avoid tab/panel overlap or misalignment:
 
-- El tab de historial queda fijo al borde derecho.
-- El panel ahora se posiciona de forma absoluta respecto al wrapper y se desliza con `transform`.
-- Se agrego un ancho responsive (`min(230px, 78vw)`) para mejorar comportamiento en pantallas pequenas.
+- The history tab stays fixed to the right edge
+- The panel is positioned absolutely relative to the wrapper and slides with `transform`
+- A responsive width (`min(230px, 78vw)`) improves small-screen behavior
 
-## Estructura principal
+## Main Structure
 
-- `index.html`: shell principal de UI y estilos.
-- `src/main.ts`: modulo principal (timer, teclado global, lazy loading).
-- `src/state.ts`: estado global y utilidades de tiempo.
-- `src/ring.ts`: logica del anillo y animacion rAF.
-- `src/timerCore.ts`: flujo start/pause/resume/stop del temporizador.
-- `src/uiBindings.ts`: render y binding de eventos de UI.
-- `src/keyboard.ts`: atajos globales y navegacion vim en menus.
-- `src/storage.ts`: localStorage + IndexedDB + serializacion.
-- `src/lazyModules.ts`: carga lazy de historial/audio.
-- `src/historyMenu.ts`: modulo lazy para historial por dia/bloques.
-- `src/audioEngine.ts`: modulo lazy para sonidos de alarma.
-- `dist/src/*.js`: salida compilada usada por `index.html`.
-- `sw.js`: Service Worker para cache/offline.
-- `sw.ts`: fuente TypeScript del Service Worker.
-- `manifest.json`: configuracion instalable de la PWA.
+- `index.html`: main UI and style shell
+- `src/main.ts`: main module (timer, global keyboard, lazy loading)
+- `src/state.ts`: global state and time utilities
+- `src/ring.ts`: ring logic and rAF animation
+- `src/timerCore.ts`: timer start/pause/resume/stop flow
+- `src/uiBindings.ts`: UI rendering and event bindings
+- `src/keyboard.ts`: global shortcuts and vim-style menu navigation
+- `src/storage.ts`: localStorage + IndexedDB + serialization
+- `src/lazyModules.ts`: lazy loading for history/audio
+- `src/historyMenu.ts`: lazy history module (days/blocks)
+- `src/audioEngine.ts`: lazy alarm sound module
+- `dist/src/*.js`: compiled output used by `index.html`
+- `sw.js`: Service Worker for cache/offline
+- `sw.ts`: TypeScript source for the Service Worker
+- `manifest.json`: installable PWA manifest

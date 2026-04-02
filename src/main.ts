@@ -23,7 +23,6 @@ const onApplyDuration = (secs: number): void => {
   ui.render();
   ring.setRingImmediate(1);
   ui.renderButtons();
-  ui.closeHistory();
 };
 
 ui = createUiBindings({
@@ -51,8 +50,7 @@ ui = createUiBindings({
   },
   onBackgroundReset: async () => {
     dom.bgEl.style.backgroundImage = "none";
-    dom.bgEl.style.background =
-      "radial-gradient(ellipse at 30% 60%, #0d2b1a 0%, transparent 60%), radial-gradient(ellipse at 70% 40%, #071a0e 0%, transparent 60%), linear-gradient(160deg, #060f09 0%, #0e2416 40%, #071510 100%)";
+    dom.bgEl.style.background = "";
     dom.bgArt.style.display = "";
     await idbDel("ff_bg");
   },
@@ -120,15 +118,19 @@ async function init(): Promise<void> {
     hasInteractiveFocus: ui.hasInteractiveFocus,
     isHistoryOpen: () => dom.histWrap.classList.contains("open"),
     isSettingsOpen: () => dom.settingsPanel.classList.contains("open"),
+    isAdvancedOpen: () => dom.advancedOverlay.classList.contains("open"),
     toggleHistory: ui.toggleHistory,
     toggleSettings: ui.toggleSettings,
     closeHistory: ui.closeHistory,
     closeSettings: ui.closeSettings,
+    closeAdvanced: ui.closeAdvanced,
     getHistoryApi,
     getSettingsItems: () => Array.from(dom.settingsPanel.querySelectorAll<HTMLElement>('[data-menu-item="true"]')),
     onStartPauseResume,
     onStop: () => timer.stopTimer(),
-    onInsertEdit: () => ui.openTimeEdit(EDITABLE_TIME_POS[0]),
+    onToggleTimeEdit: () => ui.toggleTimeEdit(),
+    onToggleShowRing: () => ui.toggleShowRing(),
+    onOpenAdvanced: () => ui.openAdvanced(),
   });
 
   try {

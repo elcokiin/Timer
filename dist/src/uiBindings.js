@@ -1,6 +1,72 @@
 import { EDITABLE_TIME_POS, fmt, parseT } from "./state.js";
 export function createUiBindings(deps) {
     const { state, dom, ring } = deps;
+    let advancedReturnFocus = null;
+    function updateThemeCards() {
+        const cards = dom.advancedThemeCards.querySelectorAll("[data-theme-card]");
+        cards.forEach((card) => {
+            const selected = card.dataset.themeCard === state.theme;
+            card.classList.toggle("active", selected);
+            card.setAttribute("aria-selected", selected ? "true" : "false");
+        });
+    }
+    function advancedCards() {
+        return Array.from(dom.advancedThemeCards.querySelectorAll("[data-theme-card]"));
+    }
+    function toggleShowRing() {
+        state.showRing = !state.showRing;
+        dom.advancedShowRing.checked = state.showRing;
+        document.body.dataset.showRing = state.showRing ? "true" : "false";
+        deps.onSavePrefs();
+    }
+    function moveAdvancedCardFocusHorizontal(horizontalDelta) {
+        const cards = advancedCards();
+        if (!cards.length)
+            return;
+        const active = document.activeElement;
+        const index = active ? cards.indexOf(active) : -1;
+        const base = index < 0 ? (horizontalDelta > 0 ? -1 : cards.length) : index;
+        const next = (base + horizontalDelta + cards.length) % cards.length;
+        cards[next]?.focus();
+    }
+    function moveAdvancedCardFocusVertical(verticalDelta) {
+        const cards = advancedCards();
+        if (!cards.length)
+            return;
+        const active = document.activeElement;
+        const index = active ? cards.indexOf(active) : -1;
+        const currentIndex = index < 0 ? 0 : index;
+        const current = cards[currentIndex];
+        if (!current)
+            return;
+        const currentRect = current.getBoundingClientRect();
+        const yTarget = currentRect.top + verticalDelta * (currentRect.height + 8);
+        let bestIndex = -1;
+        let bestDistance = Number.POSITIVE_INFINITY;
+        for (let i = 0; i < cards.length; i += 1) {
+            if (i === currentIndex)
+                continue;
+            const rect = cards[i]?.getBoundingClientRect();
+            if (!rect)
+                continue;
+            const isWantedDirection = verticalDelta > 0 ? rect.top > currentRect.top + 2 : rect.top < currentRect.top - 2;
+            if (!isWantedDirection)
+                continue;
+            const dy = Math.abs(rect.top - yTarget);
+            const dx = Math.abs(rect.left - currentRect.left);
+            const distance = dy * 10 + dx;
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                bestIndex = i;
+            }
+        }
+        if (bestIndex >= 0) {
+            cards[bestIndex]?.focus();
+            return;
+        }
+        const fallback = verticalDelta > 0 ? cards[cards.length - 1] : cards[0];
+        fallback?.focus();
+    }
     function updateRunningClass() {
         dom.timerWrap.classList.toggle("ring-running", state.status === "running");
     }
@@ -13,7 +79,9 @@ export function createUiBindings(deps) {
     function render() {
         dom.timeDisplay.textContent = fmt(state.remaining);
         dom.phaseLabel.textContent = state.phase === "focus" ? "FOCUS" : "BREAK";
-        dom.phaseLabel.style.color = state.phase === "focus" ? "rgba(255,255,255,.55)" : "#52b4e0";
+        document.body.dataset.theme = state.theme;
+        document.body.dataset.phase = state.phase;
+        document.body.dataset.showRing = state.showRing ? "true" : "false";
         document.title = `${fmt(state.remaining)} - ${state.phase === "focus" ? "Focus" : "Break"} · FocusFlow`;
         updateRunningClass();
     }
@@ -108,6 +176,15 @@ export function createUiBindings(deps) {
         render();
         ring.setRingImmediate(ring.ringFrac());
     }
+    function toggleTimeEdit() {
+        if (state.status !== "idle")
+            return;
+        if (dom.timeEdit.style.display === "block") {
+            commitEdit();
+            return;
+        }
+        openTimeEdit(EDITABLE_TIME_POS[0]);
+    }
     function closeHistory() {
         if (!dom.histWrap.classList.contains("open"))
             return;
@@ -116,6 +193,27 @@ export function createUiBindings(deps) {
     }
     function closeSettings() {
         dom.settingsPanel.classList.remove("open");
+    }
+    function closeAdvanced() {
+        if (!dom.advancedOverlay.classList.contains("open"))
+            return;
+        dom.advancedOverlay.classList.remove("open");
+        dom.advancedOverlay.setAttribute("aria-hidden", "true");
+        const nextFocus = advancedReturnFocus;
+        advancedReturnFocus = null;
+        nextFocus?.focus();
+    }
+    function openAdvanced() {
+        advancedReturnFocus =
+            document.activeElement instanceof HTMLElement ? document.activeElement : dom.advancedBtn;
+        closeSettings();
+        closeHistory();
+        dom.advancedOverlay.classList.add("open");
+        dom.advancedOverlay.setAttribute("aria-hidden", "false");
+        updateThemeCards();
+        dom.advancedShowRing.checked = state.showRing;
+        const activeCard = dom.advancedThemeCards.querySelector(`.theme-card[data-theme-card="${state.theme}"]`);
+        activeCard?.focus();
     }
     async function toggleHistory() {
         const nextOpen = !dom.histWrap.classList.contains("open");
@@ -159,6 +257,7 @@ export function createUiBindings(deps) {
             "#def-focus",
             "#def-break",
             "#apply-defaults",
+            "#advanced-btn",
         ].join(",");
         dom.settingsPanel.querySelectorAll(sel).forEach((el) => {
             el.dataset.menuItem = "true";
@@ -171,6 +270,8 @@ export function createUiBindings(deps) {
     function syncPrefsInputs() {
         dom.defFocus.value = String(Math.round(state.lastFocus / 60));
         dom.defBreak.value = String(Math.round(state.lastBreak / 60));
+        updateThemeCards();
+        dom.advancedShowRing.checked = state.showRing;
         document
             .querySelectorAll(".alarm-chip")
             .forEach((c) => c.classList.toggle("active", c.dataset.alarm === state.alarmChoice));
@@ -214,12 +315,65 @@ export function createUiBindings(deps) {
         dom.histToggle.addEventListener("click", () => {
             void toggleHistory();
         });
+        dom.advancedBtn.addEventListener("click", () => {
+            openAdvanced();
+        });
+        dom.advancedClose.addEventListener("click", () => {
+            closeAdvanced();
+        });
+        dom.advancedOverlay.addEventListener("click", (e) => {
+            if (e.target === dom.advancedOverlay)
+                closeAdvanced();
+        });
         document.addEventListener("click", (e) => {
-            if (!dom.settingsPanel.contains(e.target) && e.target !== dom.settingsBtn) {
+            const path = typeof e.composedPath === "function" ? e.composedPath() : [];
+            const insideSettings = path.includes(dom.settingsPanel) || path.includes(dom.settingsBtn);
+            const insideHistory = path.includes(dom.histWrap);
+            if (!insideSettings) {
                 dom.settingsPanel.classList.remove("open");
             }
-            if (!dom.histWrap.contains(e.target) && dom.histWrap.classList.contains("open")) {
+            if (!insideHistory && dom.histWrap.classList.contains("open")) {
                 closeHistory();
+            }
+        });
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && dom.advancedOverlay.classList.contains("open")) {
+                e.preventDefault();
+                closeAdvanced();
+                return;
+            }
+            if (!dom.advancedOverlay.classList.contains("open"))
+                return;
+            if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey || e.repeat)
+                return;
+            if (hasTypingFocus(e.target))
+                return;
+            const lower = e.key.toLowerCase();
+            if (lower === "h") {
+                e.preventDefault();
+                moveAdvancedCardFocusHorizontal(-1);
+                return;
+            }
+            if (lower === "l") {
+                e.preventDefault();
+                moveAdvancedCardFocusHorizontal(1);
+                return;
+            }
+            if (lower === "j") {
+                e.preventDefault();
+                moveAdvancedCardFocusVertical(1);
+                return;
+            }
+            if (lower === "k") {
+                e.preventDefault();
+                moveAdvancedCardFocusVertical(-1);
+                return;
+            }
+            const activeCard = document.activeElement?.closest("[data-theme-card]");
+            const isActivateKey = e.key === "Enter" || e.key === " " || e.key === "Spacebar" || e.code === "Space";
+            if (isActivateKey && activeCard) {
+                e.preventDefault();
+                activeCard.click();
             }
         });
         dom.bgBtn.addEventListener("click", () => dom.bgInput.click());
@@ -263,6 +417,29 @@ export function createUiBindings(deps) {
             const bm = parseInt(dom.defBreak.value, 10) || 5;
             deps.onApplyDefaults(fm, bm);
         });
+        dom.advancedThemeCards.addEventListener("click", (e) => {
+            const card = e.target?.closest("[data-theme-card]");
+            if (!card)
+                return;
+            state.theme = card.dataset.themeCard || "forest";
+            document.body.dataset.theme = state.theme;
+            updateThemeCards();
+            deps.onSavePrefs();
+        });
+        dom.advancedThemeCards.addEventListener("keydown", (e) => {
+            if (e.key !== "Enter" && e.key !== " ")
+                return;
+            const card = e.target?.closest("[data-theme-card]");
+            if (!card)
+                return;
+            e.preventDefault();
+            card.click();
+        });
+        dom.advancedShowRing.addEventListener("change", () => {
+            state.showRing = dom.advancedShowRing.checked;
+            document.body.dataset.showRing = state.showRing ? "true" : "false";
+            deps.onSavePrefs();
+        });
         dom.histToggle.addEventListener("mouseenter", () => {
             void deps.preloadHistory();
         });
@@ -274,8 +451,11 @@ export function createUiBindings(deps) {
         render,
         renderButtons,
         openTimeEdit,
+        toggleTimeEdit,
+        openAdvanced,
         closeHistory,
         closeSettings,
+        closeAdvanced,
         toggleHistory,
         toggleSettings,
         hasTypingFocus,
@@ -283,5 +463,6 @@ export function createUiBindings(deps) {
         markSettingsMenuItems,
         syncPrefsInputs,
         bindUiEvents,
+        toggleShowRing,
     };
 }

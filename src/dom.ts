@@ -20,6 +20,10 @@ export function getDomRefs(): DomRefs {
     phaseLabel: byId<HTMLElement>("phase-label"),
     settingsBtn: byId<HTMLButtonElement>("settings-btn"),
     settingsPanel: byId<HTMLElement>("settings-panel"),
+    advancedBtn: byId<HTMLButtonElement>("advanced-btn"),
+    advancedOverlay: byId<HTMLElement>("advanced-overlay"),
+    advancedDialog: byId<HTMLElement>("advanced-dialog"),
+    advancedClose: byId<HTMLButtonElement>("advanced-close"),
     histToggle: byId<HTMLButtonElement>("history-toggle"),
     histWrap: byId<HTMLElement>("history-wrap"),
     histDays: byId<HTMLElement>("hist-days"),
@@ -34,6 +38,8 @@ export function getDomRefs(): DomRefs {
     defFocus: byId<HTMLInputElement>("def-focus"),
     defBreak: byId<HTMLInputElement>("def-break"),
     applyDefaults: byId<HTMLButtonElement>("apply-defaults"),
+    advancedThemeCards: byId<HTMLElement>("advanced-theme-cards"),
+    advancedShowRing: byId<HTMLInputElement>("advanced-show-ring"),
     bgArt: byId<HTMLElement>("bg-art"),
   };
 }

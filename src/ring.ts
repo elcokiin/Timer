@@ -59,7 +59,7 @@ export function createRing(state: AppState, dom: DomRefs): RingApi {
     dom.ringProg.setAttribute("cx", String(CX));
     dom.ringProg.setAttribute("cy", String(CY));
     dom.ringProg.setAttribute("r", String(RADIUS));
-    dom.ringProg.setAttribute("stroke-width", String(SW * 1.7));
+    dom.ringProg.setAttribute("stroke-width", String(SW * 1.25));
     dom.ringProg.setAttribute("stroke-dasharray", String(CIRC));
     dom.ringProg.style.transition = "none";
     drawTicks();

@@ -4,6 +4,8 @@ interface Prefs {
   alarm?: string;
   lastFocus?: number;
   lastBreak?: number;
+  theme?: string;
+  showRing?: boolean;
 }
 
 function parseJson<T>(raw: string | null, fallback: T): T {
@@ -35,6 +37,8 @@ export function savePrefs(state: AppState): void {
       alarm: state.alarmChoice,
       lastFocus: state.lastFocus,
       lastBreak: state.lastBreak,
+      theme: state.theme,
+      showRing: state.showRing,
     })
   );
 }
@@ -42,6 +46,8 @@ export function savePrefs(state: AppState): void {
 export function loadPrefs(state: AppState): void {
   const p = parseJson<Prefs>(localStorage.getItem("ff_prefs"), {});
   if (p.alarm) state.alarmChoice = p.alarm;
+  if (p.theme) state.theme = p.theme;
+  if (typeof p.showRing === "boolean") state.showRing = p.showRing;
   if (p.lastFocus) {
     state.lastFocus = p.lastFocus;
     state.totalSeconds = p.lastFocus;

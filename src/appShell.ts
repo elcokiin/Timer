@@ -4,17 +4,17 @@ const APP_SHELL = `
       <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" class="bg-art-svg">
         <defs>
           <radialGradient id="g1" cx="30%" cy="70%">
-            <stop offset="0%" stop-color="#1a4a28" />
-            <stop offset="100%" stop-color="transparent" />
+            <stop offset="0%" style="stop-color: var(--art-g1-start)" />
+            <stop offset="100%" style="stop-color: transparent" />
           </radialGradient>
           <radialGradient id="g2" cx="75%" cy="30%">
-            <stop offset="0%" stop-color="#0d3320" />
-            <stop offset="100%" stop-color="transparent" />
+            <stop offset="0%" style="stop-color: var(--art-g2-start)" />
+            <stop offset="100%" style="stop-color: transparent" />
           </radialGradient>
         </defs>
         <ellipse cx="25%" cy="75%" rx="35%" ry="40%" fill="url(#g1)" />
         <ellipse cx="78%" cy="28%" rx="30%" ry="35%" fill="url(#g2)" />
-        <g stroke="#2a6640" stroke-width="1.2" fill="none" opacity=".6">
+        <g style="stroke: var(--art-line-strong)" stroke-width="1.2" fill="none" opacity=".6">
           <path d="M-20,400 Q100,200 300,100 Q500,0 700,150" />
           <path d="M0,600 Q200,400 400,350 Q600,300 900,200" />
           <path d="M100,700 Q250,500 450,430 Q650,360 1000,280" />
@@ -23,7 +23,7 @@ const APP_SHELL = `
           <path d="M300,100 Q280,80 260,95 M300,100 Q310,75 295,60 M300,100 Q325,85 320,65" />
           <path d="M500,0 Q480,20 465,15 M500,0 Q515,25 510,40 M500,0 Q525,15 530,-10" />
         </g>
-        <g stroke="#1a4a28" stroke-width="0.8" fill="none" opacity=".4">
+        <g style="stroke: var(--art-line-soft)" stroke-width="0.8" fill="none" opacity=".4">
           <path d="M800,700 Q700,500 600,450 Q500,400 300,500" />
           <path d="M1000,600 Q850,450 750,380 Q650,310 400,350" />
           <path d="M900,800 Q780,600 680,520 Q580,440 350,480" />
@@ -73,6 +73,60 @@ const APP_SHELL = `
       </div>
       <button class="file-btn file-btn--mt8" id="apply-defaults">Apply</button>
     </div>
+    <div class="settings-sep"></div>
+    <div class="settings-section">
+      <button class="file-btn" id="advanced-btn">Advanced settings</button>
+    </div>
+  </div>
+
+  <div id="advanced-overlay" aria-hidden="true">
+    <div id="advanced-dialog" role="dialog" aria-modal="true" aria-labelledby="advanced-title" aria-describedby="advanced-desc">
+      <div class="advanced-head">
+        <h3 id="advanced-title">Advanced settings</h3>
+        <button id="advanced-close" class="advanced-close" aria-label="Close">✕</button>
+      </div>
+      <p id="advanced-desc" class="advanced-desc">Choose a theme for colors and background mood.</p>
+      <div class="advanced-section">
+        <label>Theme</label>
+        <div id="advanced-theme-cards" class="theme-cards" role="listbox" aria-label="Theme presets">
+          <button class="theme-card" data-theme-card="forest" type="button">
+            <span class="theme-card-name">Forest</span>
+            <span class="theme-card-preview forest"></span>
+          </button>
+          <button class="theme-card" data-theme-card="ocean" type="button">
+            <span class="theme-card-name">Ocean</span>
+            <span class="theme-card-preview ocean"></span>
+          </button>
+          <button class="theme-card" data-theme-card="sunset" type="button">
+            <span class="theme-card-name">Sunset</span>
+            <span class="theme-card-preview sunset"></span>
+          </button>
+          <button class="theme-card" data-theme-card="amber" type="button">
+            <span class="theme-card-name">Amber</span>
+            <span class="theme-card-preview amber"></span>
+          </button>
+          <button class="theme-card" data-theme-card="mono" type="button">
+            <span class="theme-card-name">Mono</span>
+            <span class="theme-card-preview mono"></span>
+          </button>
+          <button class="theme-card" data-theme-card="graphite" type="button">
+            <span class="theme-card-name">Graphite</span>
+            <span class="theme-card-preview graphite"></span>
+          </button>
+        </div>
+      </div>
+      <div class="advanced-section">
+        <label class="advanced-switch" for="advanced-show-ring">
+          <span class="advanced-switch-copy">
+            <span class="advanced-switch-title">Show animated ring</span>
+          </span>
+          <span class="advanced-switch-track">
+            <input id="advanced-show-ring" type="checkbox" checked />
+            <span class="advanced-switch-thumb"></span>
+          </span>
+        </label>
+      </div>
+    </div>
   </div>
 
   <div id="history-wrap">
@@ -96,7 +150,7 @@ const APP_SHELL = `
       <svg id="ticks-svg"></svg>
       <svg id="ring-svg">
         <circle id="ring-bg" fill="none" stroke="rgba(255,255,255,0.08)" />
-        <circle id="ring-progress" fill="none" stroke="#e05252" stroke-linecap="round" />
+        <circle id="ring-progress" fill="none" stroke="currentColor" stroke-linecap="round" />
       </svg>
       <div id="timer-center">
         <span id="phase-label">FOCUS</span>

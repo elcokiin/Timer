@@ -299,6 +299,48 @@ export function initHistoryMenu(options: HistoryMenuOptions): HistoryApi {
     detailEl.querySelector<HTMLElement>(`.hist-period-head[data-period="${period}"]`)?.focus();
   }
 
+  function deleteFocusedItem(): boolean {
+    const active = document.activeElement;
+    if (!(active instanceof HTMLElement)) return false;
+    const item = active.closest('.hist-item[data-kind="focus-item"]') as HTMLElement | null;
+    if (!item) return false;
+
+    const ts = Number(item.dataset.ts || 0);
+    if (!ts) return false;
+
+    const before = Array.from(detailEl.querySelectorAll<HTMLElement>('.hist-item[data-kind="focus-item"]'));
+    const index = before.indexOf(item);
+    const nearbyCandidates = [before[index + 1], before[index - 1]]
+      .map((el) => Number(el?.dataset.ts || 0))
+      .filter((candidateTs) => candidateTs > 0);
+
+    removeHistoryItem(ts);
+
+    for (const candidateTs of nearbyCandidates) {
+      const nearby = detailEl.querySelector<HTMLElement>(`.hist-item[data-kind="focus-item"][data-ts="${candidateTs}"]`);
+      if (nearby) {
+        nearby.focus();
+        return true;
+      }
+    }
+
+    const firstItem = detailEl.querySelector<HTMLElement>('.hist-item[data-kind="focus-item"]');
+    if (firstItem) {
+      firstItem.focus();
+      return true;
+    }
+
+    const firstPeriod = detailEl.querySelector<HTMLElement>('.hist-period-head[data-menu-item="true"]');
+    if (firstPeriod) {
+      firstPeriod.focus();
+      return true;
+    }
+
+    daysEl.querySelector<HTMLElement>('.hist-tab.active')?.focus();
+
+    return true;
+  }
+
   render();
 
   return {
@@ -307,5 +349,6 @@ export function initHistoryMenu(options: HistoryMenuOptions): HistoryApi {
     selectPrevDay,
     selectNextDay,
     toggleFocusedPeriod,
+    deleteFocusedItem,
   };
 }

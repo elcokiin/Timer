@@ -4,6 +4,8 @@ export type TimerStatus = "idle" | "running" | "paused";
 export interface AppState {
   phase: Phase;
   status: TimerStatus;
+  theme: string;
+  showRing: boolean;
   totalSeconds: number;
   remaining: number;
   lastFocus: number;
@@ -25,6 +27,7 @@ export interface HistoryApi {
   selectPrevDay: () => void;
   selectNextDay: () => void;
   toggleFocusedPeriod: (direction: -1 | 1) => void;
+  deleteFocusedItem: () => boolean;
 }
 
 export interface DomRefs {
@@ -40,6 +43,10 @@ export interface DomRefs {
   phaseLabel: HTMLElement;
   settingsBtn: HTMLButtonElement;
   settingsPanel: HTMLElement;
+  advancedBtn: HTMLButtonElement;
+  advancedOverlay: HTMLElement;
+  advancedDialog: HTMLElement;
+  advancedClose: HTMLButtonElement;
   histToggle: HTMLButtonElement;
   histWrap: HTMLElement;
   histDays: HTMLElement;
@@ -54,5 +61,7 @@ export interface DomRefs {
   defFocus: HTMLInputElement;
   defBreak: HTMLInputElement;
   applyDefaults: HTMLButtonElement;
+  advancedThemeCards: HTMLElement;
+  advancedShowRing: HTMLInputElement;
   bgArt: HTMLElement;
 }

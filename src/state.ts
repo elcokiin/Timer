@@ -3,6 +3,8 @@ import type { AppState } from "./types.js";
 export const state: AppState = {
   phase: "focus",
   status: "idle",
+  theme: "forest",
+  showRing: true,
   totalSeconds: 25 * 60,
   remaining: 25 * 60,
   lastFocus: 25 * 60,

@@ -1,5 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="80" fill="#0a1a12" />
-  <circle cx="256" cy="256" r="200" fill="none" stroke="#e05252" stroke-width="20" />
-  <text x="256" y="320" font-family="serif" font-size="200" text-anchor="middle" fill="#ffffff">F</text>
+  <defs>
+    <linearGradient id="bg" x1="64" y1="54" x2="448" y2="458" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#081421" />
+      <stop offset="1" stop-color="#102636" />
+    </linearGradient>
+    <linearGradient id="spark" x1="142" y1="132" x2="370" y2="384" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#71f3de" />
+      <stop offset="1" stop-color="#3db7ff" />
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="114" fill="url(#bg)" />
+
+  <path
+    d="M256 108C272 176 336 240 404 256C336 272 272 336 256 404C240 336 176 272 108 256C176 240 240 176 256 108Z"
+    fill="url(#spark)"
+  />
+  <circle cx="256" cy="256" r="40" fill="#0f2232" opacity="0.95" />
+  <circle cx="352" cy="166" r="19" fill="#9afcf2" opacity="0.85" />
 </svg>
