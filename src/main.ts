@@ -119,9 +119,16 @@ const onStartPauseResume = (): void => {
 
 function registerServiceWorker(): void {
   if (!("serviceWorker" in navigator)) return;
-  window.addEventListener("load", () => {
+  const register = (): void => {
     void navigator.serviceWorker.register("./sw.js").catch(() => {});
-  });
+  };
+
+  if (document.readyState === "complete") {
+    register();
+    return;
+  }
+
+  window.addEventListener("load", register, { once: true });
 }
 
 async function init(): Promise<void> {
