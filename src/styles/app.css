@@ -797,7 +797,7 @@ body[data-show-ring="false"] #ticks-svg {
   opacity: 0;
   visibility: hidden;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease, visibility 0s linear 0.3s;
-  max-height: 70vh;
+  height: 70vh;
   overflow-y: auto;
   overflow-x: hidden;
   box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
@@ -853,7 +853,11 @@ body[data-show-ring="false"] #ticks-svg {
   margin-bottom: 12px;
   overflow-x: auto;
   padding-bottom: 4px;
-  scrollbar-width: thin;
+  scrollbar-width: none;
+}
+
+.hist-days::-webkit-scrollbar {
+  display: none;
 }
 
 .hist-tab {

@@ -20,6 +20,7 @@ interface KeyboardDeps {
   onToggleShowRing: () => void;
   onOpenAdvanced: () => void;
   onDeleteFocusedCustomAlarm: () => boolean;
+  onCycleTheme: () => void;
 }
 
 export function setupKeyboard(deps: KeyboardDeps): void {
@@ -119,6 +120,14 @@ export function setupKeyboard(deps: KeyboardDeps): void {
     items[items.length - 1]?.focus();
   }
 
+  function moveMenuFocusWithin(items: HTMLElement[], dir: -1 | 1): void {
+    if (!items.length) return;
+    const active = document.activeElement as HTMLElement | null;
+    const index = active ? items.indexOf(active) : -1;
+    const next = index < 0 ? (dir > 0 ? 0 : items.length - 1) : (index + dir + items.length) % items.length;
+    items[next]?.focus();
+  }
+
   function handleMenuKeys(event: KeyboardEvent, kind: "history" | "settings"): boolean {
     const key = event.key;
     const lower = key.toLowerCase();
@@ -129,14 +138,12 @@ export function setupKeyboard(deps: KeyboardDeps): void {
     if (lower === "h" && !event.shiftKey) {
       event.preventDefault();
       if (kind === "history" && historyApi) {
-        if (activeKind === "day-tab") {
-          historyApi.selectPrevDay();
-          return true;
-        }
         if (activeKind === "period-toggle") {
           historyApi.toggleFocusedPeriod(-1);
-          return true;
+        } else {
+          historyApi.selectPrevDay();
         }
+        return true;
       }
       if (kind === "settings") {
         const settingsItems = menuItems("settings").filter((el) => !el.hasAttribute("disabled"));
@@ -149,14 +156,12 @@ export function setupKeyboard(deps: KeyboardDeps): void {
     if (lower === "l" && !event.shiftKey) {
       event.preventDefault();
       if (kind === "history" && historyApi) {
-        if (activeKind === "day-tab") {
-          historyApi.selectNextDay();
-          return true;
-        }
         if (activeKind === "period-toggle") {
           historyApi.toggleFocusedPeriod(1);
-          return true;
+        } else {
+          historyApi.selectNextDay();
         }
+        return true;
       }
       if (kind === "settings") {
         const settingsItems = menuItems("settings").filter((el) => !el.hasAttribute("disabled"));
@@ -168,12 +173,22 @@ export function setupKeyboard(deps: KeyboardDeps): void {
 
     if (lower === "j") {
       event.preventDefault();
-      moveMenuFocus(kind, 1);
+      if (kind === "history") {
+        const historyItems = menuItems(kind).filter(el => !el.matches(".hist-tab"));
+        moveMenuFocusWithin(historyItems, 1);
+      } else {
+        moveMenuFocus(kind, 1);
+      }
       return true;
     }
     if (lower === "k") {
       event.preventDefault();
-      moveMenuFocus(kind, -1);
+      if (kind === "history") {
+        const historyItems = menuItems(kind).filter(el => !el.matches(".hist-tab"));
+        moveMenuFocusWithin(historyItems, -1);
+      } else {
+        moveMenuFocus(kind, -1);
+      }
       return true;
     }
 
@@ -300,6 +315,12 @@ export function setupKeyboard(deps: KeyboardDeps): void {
     if (key === "e" && !e.repeat) {
       e.preventDefault();
       deps.onOpenAdvanced();
+      return;
+    }
+
+    if (key === "d" && !menu && !e.repeat) {
+      e.preventDefault();
+      deps.onCycleTheme();
       return;
     }
 

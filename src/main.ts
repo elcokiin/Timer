@@ -1,10 +1,18 @@
 import { getDomRefs } from "./dom.js";
 import { renderAppShell } from "./appShell.js";
 import { setupKeyboard } from "./keyboard.js";
-import { ensureHistoryModule as ensureHistoryModuleLazy, getHistoryApi, playAlarmLazy, preloadHistory } from "./lazyModules.js";
+import {
+  ensureHistoryModule as ensureHistoryModuleLazy,
+  getHistoryApi,
+  playAlarmLazy,
+  preloadHistory,
+} from "./lazyModules.js";
 import { createRing } from "./ring.js";
-import { EDITABLE_TIME_POS, state } from "./state.js";
-import { stripFileExtension, trimAlarmToAudibleThreeSeconds } from "./audioTrim.js";
+import { state } from "./state.js";
+import {
+  stripFileExtension,
+  trimAlarmToAudibleThreeSeconds,
+} from "./audioTrim.js";
 import {
   addHistoryRaw,
   fileToDataURL,
@@ -154,11 +162,17 @@ async function init(): Promise<void> {
     closeSettings: ui.closeSettings,
     closeAdvanced: ui.closeAdvanced,
     getHistoryApi,
-    getSettingsItems: () => Array.from(dom.settingsPanel.querySelectorAll<HTMLElement>('[data-menu-item="true"]')),
+    getSettingsItems: () =>
+      Array.from(
+        dom.settingsPanel.querySelectorAll<HTMLElement>(
+          '[data-menu-item="true"]',
+        ),
+      ),
     onStartPauseResume,
     onStop: () => timer.stopTimer(),
     onToggleTimeEdit: () => ui.toggleTimeEdit(),
     onToggleShowRing: () => ui.toggleShowRing(),
+    onCycleTheme: () => ui.cycleTheme(),
     onOpenAdvanced: () => ui.openAdvanced(),
     onDeleteFocusedCustomAlarm: () => ui.deleteFocusedCustomAlarm(),
   });
@@ -180,18 +194,30 @@ async function init(): Promise<void> {
     state.customAlarms = [];
   }
 
-  const selectedCustomId = state.alarmChoice.startsWith("custom:") ? state.alarmChoice.slice("custom:".length) : "";
-  if (selectedCustomId && !state.customAlarms.some((item) => item.id === selectedCustomId)) {
+  const selectedCustomId = state.alarmChoice.startsWith("custom:")
+    ? state.alarmChoice.slice("custom:".length)
+    : "";
+  if (
+    selectedCustomId &&
+    !state.customAlarms.some((item) => item.id === selectedCustomId)
+  ) {
     state.alarmChoice = "bell";
   }
   ui.syncPrefsInputs();
 
   if ("requestIdleCallback" in window) {
-    (window as Window & { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => void }).requestIdleCallback(
+    (
+      window as Window & {
+        requestIdleCallback: (
+          cb: () => void,
+          opts?: { timeout: number },
+        ) => void;
+      }
+    ).requestIdleCallback(
       () => {
         void preloadHistory({ state, dom, onApplyDuration });
       },
-      { timeout: 2000 }
+      { timeout: 2000 },
     );
   } else {
     setTimeout(() => {

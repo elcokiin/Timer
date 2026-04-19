@@ -38,6 +38,7 @@ export interface UiApi {
   bindUiEvents: () => void;
   toggleShowRing: () => void;
   deleteFocusedCustomAlarm: () => boolean;
+  cycleTheme: () => void;
 }
 
 export function createUiBindings(deps: UiDeps): UiApi {
@@ -104,6 +105,16 @@ export function createUiBindings(deps: UiDeps): UiApi {
     state.showRing = !state.showRing;
     dom.advancedShowRing.checked = state.showRing;
     document.body.dataset.showRing = state.showRing ? "true" : "false";
+    deps.onSavePrefs();
+  }
+
+  const themes: string[] = ["forest", "ocean", "sunset", "mono", "amber", "graphite"];
+  function cycleTheme() {
+    const currentIndex = themes.indexOf(state.theme);
+    const nextIndex = (currentIndex + 1) % themes.length;
+    state.theme = themes[nextIndex]!;
+    document.body.dataset.theme = state.theme;
+    updateThemeCards();
     deps.onSavePrefs();
   }
 
@@ -606,5 +617,6 @@ export function createUiBindings(deps: UiDeps): UiApi {
     bindUiEvents,
     toggleShowRing,
     deleteFocusedCustomAlarm,
+    cycleTheme,
   };
 }
