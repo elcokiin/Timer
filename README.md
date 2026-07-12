@@ -1,6 +1,6 @@
 # FocusFlow PWA
 
-Single-page Pomodoro timer (`index.html`) with history, background/alarm customization, and offline mode via Service Worker.
+Single-page Pomodoro timer with history, background/alarm customization, push notifications, and offline mode via Service Worker.
 
 ## Quick Start
 
@@ -16,23 +16,45 @@ Single-page Pomodoro timer (`index.html`) with history, background/alarm customi
 
 ## Keyboard Shortcuts
 
-- `Space` or `Enter`: toggle start, pause, and resume timer
-- `s`: stop the timer (while running or paused)
-- `i`: toggle timer time edit mode (idle only)
-- `Shift+H`: open/close the history panel
-- `,` or `p`: open/close the settings panel
-- `e`: toggle advanced settings (open/close)
-- `r`: show/hide the animated ring (global)
-- `Esc`: close open panels
+| Key | Action |
+|---|---|
+| `Space` / `Enter` | Start / Pause / Resume timer |
+| `s` | Stop timer (running/paused) or Toggle settings (idle) |
+| `i` | Edit time (idle only) |
+| `r` | Toggle animated ring visibility |
+| `p` | Toggle Pomodoro / Focus-only mode |
+| `d` | Cycle theme (global) or Delete focused item (in menus) |
+| `e` | Open advanced settings |
+| `H` | Toggle history panel |
+| `,` | Toggle settings panel |
+| `?` | Show/hide keyboard shortcuts help |
+| `q` / `Esc` | Close any open panel/menu |
 
-Vim-style navigation in open menus:
+Vim-style navigation in open menus (history, settings):
 
-- `j` / `k`: move focus down/up
-- `G`: jump to bottom
-- `gg`: jump to top
-- In history: `h` / `l` changes selected day
-- In advanced settings modal: `h` / `l` moves across cards and `j` / `k` moves up/down rows
-- `Enter`: activate focused item (tab, block, or session)
+| Key | Action |
+|---|---|
+| `j` / `k` | Move focus down / up |
+| `G` | Jump to bottom |
+| `gg` (tap twice) | Jump to top |
+| `h` / `l` | History: cycle days or collapse periods. Settings: move alarm chips horizontally |
+| `d` | Delete focused history entry or custom alarm |
+| `Enter` / `Space` | Activate focused item |
+
+In the advanced settings modal:
+
+| Key | Action |
+|---|---|
+| `h` / `l` / `j` / `k` | Navigate theme cards |
+| `p` | Toggle Pomodoro mode |
+| `r` | Toggle ring visibility |
+| `q` / `Esc` / `e` | Close |
+
+Shortcuts do not trigger while typing in `input`, `textarea`, `select`, or `contenteditable` elements. `Space` and `Enter` do not override normal interaction when focus is on buttons/links.
+
+## Push Notifications
+
+Available in Advanced settings. When enabled, the browser will ask for permission. On timer completion, a system notification is shown with the session result (focus → "Break time!", break → "Focus time!"). Requires the page to be served over HTTPS or localhost.
 
 ## History
 
@@ -41,19 +63,6 @@ Vim-style navigation in open menus:
 - Each day shows `Morning`, `Afternoon`, `Evening` blocks
 - Only `focus` time is counted for day/block totals
 - Click or `Enter` on a focus session applies that duration to the timer
-
-Behavior notes:
-
-- Shortcuts do not trigger while typing in `input`, `textarea`, `select`, or `contenteditable` elements
-- `Space` and `Enter` do not override normal interaction when focus is on buttons/links
-
-## Right Panel (History)
-
-The right side panel positioning was adjusted to avoid tab/panel overlap or misalignment:
-
-- The history tab stays fixed to the right edge
-- The panel is positioned absolutely relative to the wrapper and slides with `transform`
-- A responsive width (`min(230px, 78vw)`) improves small-screen behavior
 
 ## Main Structure
 
@@ -64,10 +73,15 @@ The right side panel positioning was adjusted to avoid tab/panel overlap or misa
 - `src/timerCore.ts`: timer start/pause/resume/stop flow
 - `src/uiBindings.ts`: UI rendering and event bindings
 - `src/keyboard.ts`: global shortcuts and vim-style menu navigation
+- `src/shortcuts.ts`: keyboard shortcuts help dialog
 - `src/storage.ts`: localStorage + IndexedDB + serialization
 - `src/lazyModules.ts`: lazy loading for history/audio
 - `src/historyMenu.ts`: lazy history module (days/blocks)
 - `src/audioEngine.ts`: lazy alarm sound module
+- `src/audioTrim.ts`: audio file trimming for custom alarms
+- `src/dom.ts`: typed DOM element references
+- `src/types.ts`: TypeScript type definitions
+- `src/appShell.ts`: full HTML template string
 - `dist/src/*.js`: compiled output used by `index.html`
 - `sw.js`: Service Worker for cache/offline
 - `sw.ts`: TypeScript source for the Service Worker
