@@ -2,6 +2,10 @@
 
 Single-page Pomodoro timer with history, background/alarm customization, push notifications, and offline mode via Service Worker.
 
+### The Gateway
+
+You open it not because you have energy, but because you want energy. You tell yourself "just 10 minutes" — a commitment so small it bypasses the resistance. Once the timer is running, inertia takes over. The hardest part was opening the app.
+
 ## Quick Start
 
 - Install dependencies: `npm install`
