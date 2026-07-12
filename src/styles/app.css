@@ -719,6 +719,19 @@ input[type="file"] {
   color: var(--dim);
 }
 
+.advanced-switch-title kbd {
+  font-family: monospace;
+  font-size: 10px;
+  line-height: 1;
+  color: var(--accent);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 5px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
 .advanced-switch-track {
   position: relative;
   width: 44px;

@@ -119,7 +119,7 @@ const APP_SHELL = `
       <div class="advanced-section">
         <label class="advanced-switch" for="timer-mode-switch">
           <span class="advanced-switch-copy">
-            <span class="advanced-switch-title">Pomodoro mode</span>
+            <span class="advanced-switch-title">Pomodoro mode <kbd>p</kbd></span>
             <span class="advanced-switch-desc" id="timer-mode-desc">Focus + Break cycles</span>
           </span>
           <span class="advanced-switch-track">
@@ -131,7 +131,7 @@ const APP_SHELL = `
       <div class="advanced-section">
         <label class="advanced-switch" for="advanced-show-ring">
           <span class="advanced-switch-copy">
-            <span class="advanced-switch-title">Show animated ring</span>
+            <span class="advanced-switch-title">Show animated ring <kbd>r</kbd></span>
           </span>
           <span class="advanced-switch-track">
             <input id="advanced-show-ring" type="checkbox" checked />
