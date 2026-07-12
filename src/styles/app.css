@@ -532,23 +532,28 @@ input[type="file"] {
   color: var(--white);
 }
 
-#advanced-overlay {
+#advanced-overlay, #shortcuts-overlay {
   position: fixed;
   inset: 0;
-  z-index: 40;
-  display: none;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: rgba(2, 6, 10, 0.62);
-  backdrop-filter: blur(10px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
 }
 
-#advanced-overlay.open {
-  display: flex;
+#advanced-overlay.open, #shortcuts-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
 }
 
-#advanced-dialog {
+#advanced-dialog, #shortcuts-dialog {
   width: min(520px, 100%);
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.14);
@@ -739,11 +744,41 @@ input[type="file"] {
   height: 18px;
   border-radius: 50%;
   background: var(--white);
-  transition: transform 0.2s ease;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .advanced-switch-track input:checked + .advanced-switch-thumb {
   transform: translateX(20px);
+}
+
+/* Shortcuts Dialog */
+.shortcuts-content {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.shortcut-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 13px;
+  color: var(--white);
+}
+
+.shortcut-row .key {
+  font-family: monospace;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--accent);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .advanced-switch-track:has(input:checked) {

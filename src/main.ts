@@ -8,6 +8,7 @@ import {
   preloadHistory,
 } from "./lazyModules.js";
 import { createRing } from "./ring.js";
+import { setupShortcutsDialog } from "./shortcuts.js";
 import { state } from "./state.js";
 import {
   stripFileExtension,
@@ -142,6 +143,7 @@ function registerServiceWorker(): void {
 }
 
 async function init(): Promise<void> {
+  setupShortcutsDialog();
   ring.setupRing();
   loadPrefs(state);
   ui.markSettingsMenuItems();
