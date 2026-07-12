@@ -21,6 +21,7 @@ export interface AppState {
   alarmChoice: string;
   customAlarms: CustomAlarm[];
   interval: ReturnType<typeof setInterval> | null;
+  notificationsEnabled: boolean;
 }
 
 export interface HistoryEntry {
@@ -73,5 +74,6 @@ export interface DomRefs {
   timerModeSwitch: HTMLInputElement;
   advancedThemeCards: HTMLElement;
   advancedShowRing: HTMLInputElement;
+  advancedNotifications: HTMLInputElement;
   bgArt: HTMLElement;
 }

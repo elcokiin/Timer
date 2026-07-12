@@ -139,6 +139,18 @@ const APP_SHELL = `
           </span>
         </label>
       </div>
+      <div class="advanced-section">
+        <label class="advanced-switch" for="advanced-notifications">
+          <span class="advanced-switch-copy">
+            <span class="advanced-switch-title">Push notifications</span>
+            <span class="advanced-switch-desc">Notify when timer ends</span>
+          </span>
+          <span class="advanced-switch-track">
+            <input id="advanced-notifications" type="checkbox" />
+            <span class="advanced-switch-thumb"></span>
+          </span>
+        </label>
+      </div>
     </div>
   </div>
 

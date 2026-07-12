@@ -7,6 +7,7 @@ interface Prefs {
   theme?: string;
   showRing?: boolean;
   timerMode?: TimerMode;
+  notificationsEnabled?: boolean;
 }
 
 function parseJson<T>(raw: string | null, fallback: T): T {
@@ -41,6 +42,7 @@ export function savePrefs(state: AppState): void {
       theme: state.theme,
       showRing: state.showRing,
       timerMode: state.timerMode,
+      notificationsEnabled: state.notificationsEnabled,
     })
   );
 }
@@ -57,6 +59,7 @@ export function loadPrefs(state: AppState): void {
     state.remaining = p.lastFocus;
   }
   if (p.lastBreak) state.lastBreak = p.lastBreak;
+  if (typeof p.notificationsEnabled === "boolean") state.notificationsEnabled = p.notificationsEnabled;
 }
 
 let cachedDB: IDBDatabase | null = null;

@@ -13,6 +13,7 @@ export const state: AppState = {
   alarmChoice: "bell",
   customAlarms: [],
   interval: null,
+  notificationsEnabled: false,
 };
 
 export function fmt(s: number): string {

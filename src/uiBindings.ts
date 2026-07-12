@@ -421,10 +421,18 @@ export function createUiBindings(deps: UiDeps): UiApi {
     syncTimerModeUi();
     updateThemeCards();
     dom.advancedShowRing.checked = state.showRing;
+    dom.advancedNotifications.checked = state.notificationsEnabled;
     renderAlarmCustomChips();
     markSettingsMenuItems();
     setActiveAlarmChip(state.alarmChoice);
     requestAnimationFrame(syncAlarmChipMarquee);
+  }
+
+  function requestNotificationPermission(): void {
+    if (!("Notification" in window)) return;
+    if (Notification.permission === "default") {
+      void Notification.requestPermission();
+    }
   }
 
   function bindUiEvents() {
@@ -629,6 +637,14 @@ export function createUiBindings(deps: UiDeps): UiApi {
       state.showRing = dom.advancedShowRing.checked;
       document.body.dataset.showRing = state.showRing ? "true" : "false";
       deps.onSavePrefs();
+    });
+
+    dom.advancedNotifications.addEventListener("change", () => {
+      state.notificationsEnabled = dom.advancedNotifications.checked;
+      deps.onSavePrefs();
+      if (state.notificationsEnabled) {
+        void requestNotificationPermission();
+      }
     });
 
     dom.histToggle.addEventListener("mouseenter", () => {

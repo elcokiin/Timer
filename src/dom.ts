@@ -42,6 +42,7 @@ export function getDomRefs(): DomRefs {
     timerModeSwitch: byId<HTMLInputElement>("timer-mode-switch"),
     advancedThemeCards: byId<HTMLElement>("advanced-theme-cards"),
     advancedShowRing: byId<HTMLInputElement>("advanced-show-ring"),
+    advancedNotifications: byId<HTMLInputElement>("advanced-notifications"),
     bgArt: byId<HTMLElement>("bg-art"),
   };
 }

@@ -111,6 +111,27 @@ ui = createUiBindings({
   },
 });
 
+function requestNotificationPermission(): void {
+  if (!("Notification" in window)) return;
+  if (Notification.permission === "default") {
+    void Notification.requestPermission();
+  }
+}
+
+function sendTimerEndNotification(): void {
+  if (!("Notification" in window)) return;
+  if (!state.notificationsEnabled) return;
+  if (Notification.permission !== "granted") return;
+  const phaseText = state.timerMode === "focus-only" || state.phase === "focus"
+    ? "Focus session"
+    : "Break";
+  const phaseComplete = state.phase === "focus" ? "Break time!" : "Focus time!";
+  new Notification("FocusFlow", {
+    body: `${phaseText} complete. ${phaseComplete}`,
+    icon: "./icons/icon-192.svg",
+  });
+}
+
 const timer = createTimerCore({
   state,
   ring,
@@ -120,6 +141,7 @@ const timer = createTimerCore({
   addHistoryRaw,
   getHistoryApi,
   playAlarmLazy: () => playAlarmLazy(state),
+  onNotifyEnd: sendTimerEndNotification,
 });
 
 const onStartPauseResume = (): void => {
@@ -146,6 +168,9 @@ async function init(): Promise<void> {
   setupShortcutsDialog();
   ring.setupRing();
   loadPrefs(state);
+  if (state.notificationsEnabled) {
+    requestNotificationPermission();
+  }
   ui.markSettingsMenuItems();
   ui.syncPrefsInputs();
   ui.render();

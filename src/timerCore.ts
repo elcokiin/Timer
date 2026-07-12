@@ -10,6 +10,7 @@ interface TimerDeps {
   addHistoryRaw: (secs: number, phase: Phase) => void;
   getHistoryApi: () => HistoryApi | null;
   playAlarmLazy: () => Promise<void>;
+  onNotifyEnd: () => void;
 }
 
 export interface TimerApi {
@@ -25,6 +26,7 @@ export function createTimerCore(deps: TimerDeps): TimerApi {
 
   function onEnd(): void {
     void deps.playAlarmLazy();
+    deps.onNotifyEnd();
     state.status = "idle";
     if (state.timerMode === "focus-only") {
       // Focus-only: always reset to focus

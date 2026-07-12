@@ -1,5 +1,5 @@
 "use strict";
-const CACHE = "focusflow-v6";
+const CACHE = "focusflow-v7";
 const ASSETS = [
     "./",
     "./index.html",
