@@ -1,92 +1,131 @@
-# FocusFlow PWA
+<p align="center">
+  <img src="./icons/icon-192.svg" width="96" alt="FocusFlow" />
+</p>
 
-Single-page Pomodoro timer with history, background/alarm customization, push notifications, and offline mode via Service Worker.
+<h1 align="center">FocusFlow</h1>
+
+<p align="center">
+  A keyboard-driven Pomodoro timer that loads instantly and works offline.
+  <br/>
+  Zero frameworks. Zero accounts. Zero config.
+</p>
+
+---
 
 ### The Gateway
 
 You open it not because you have energy, but because you want energy. You tell yourself "just 10 minutes" — a commitment so small it bypasses the resistance. Once the timer is running, inertia takes over. The hardest part was opening the app.
 
+---
+
+## Features
+
+- **Pomodoro & Focus-only modes** — full cycles or single sessions
+- **Keyboard-first** — every operation without touching the mouse
+- **Offline by default** — Service Worker caches everything on first visit
+- **Push notifications** — system alerts when a session ends
+- **Custom alarms** — upload your own audio files
+- **Custom backgrounds** — set any image as the timer background
+- **6 color themes** — Forest, Ocean, Sunset, Amber, Mono, Graphite
+- **Session history** — grouped by day with morning/afternoon/evening blocks
+- **Animated ring** — SVG progress indicator with optional tick marks
+- **Alarm sounds** — three built-in (Bell, Chime, Digital) plus custom uploads
+
 ## Quick Start
 
-- Install dependencies: `npm install`
-- Compile TypeScript: `npm run build`
-- Serve with a local server (for example `npx serve .`)
-- Open the local URL (not the file directly) to validate PWA/offline behavior
+```bash
+npm install
+npm run build
+npx serve .
+```
 
-## Build TypeScript
+Then open the local URL. Do **not** open the file directly — Service Worker registration and push notifications require HTTP or HTTPS.
 
-- `npm run build`: compiles `src/**/*.ts` to `dist/src/*.js` and `sw.ts` to `sw.js`
-- `npm run typecheck`: strict type checking for the app
+> [!NOTE]
+> You can also use `python3 -m http.server` or any other static file server.
+
+## Build Commands
+
+| Command | Description |
+|---|---|
+| `npm run build` | Compiles `src/**/*.ts` to `dist/src/*.js` and `sw.ts` to `sw.js` |
+| `npm run typecheck` | Runs strict TypeScript type checking |
 
 ## Keyboard Shortcuts
 
+### Global
+
 | Key | Action |
 |---|---|
-| `Space` / `Enter` | Start / Pause / Resume timer |
-| `s` | Stop timer (running/paused) or Toggle settings (idle) |
+| `Space` / `Enter` | Start / Pause / Resume |
+| `s` | Stop (running/paused) or Toggle settings (idle) |
 | `i` | Edit time (idle only) |
-| `r` | Toggle animated ring visibility |
-| `p` | Toggle Pomodoro / Focus-only mode |
-| `d` | Cycle theme (global) or Delete focused item (in menus) |
+| `r` | Toggle ring visibility |
+| `p` | Toggle timer mode |
+| `d` | Cycle theme |
 | `e` | Open advanced settings |
 | `H` | Toggle history panel |
 | `,` | Toggle settings panel |
-| `?` | Show/hide keyboard shortcuts help |
-| `q` / `Esc` | Close any open panel/menu |
+| `?` | Show keyboard shortcuts help |
+| `q` / `Esc` | Close any open panel |
 
-Vim-style navigation in open menus (history, settings):
+### Navigation (when a menu is open)
 
 | Key | Action |
 |---|---|
-| `j` / `k` | Move focus down / up |
+| `j` / `k` | Move down / up |
+| `h` / `l` | History: cycle days. Settings: move alarm chips |
 | `G` | Jump to bottom |
-| `gg` (tap twice) | Jump to top |
-| `h` / `l` | History: cycle days or collapse periods. Settings: move alarm chips horizontally |
-| `d` | Delete focused history entry or custom alarm |
+| `gg` (double-tap) | Jump to top |
+| `d` | Delete focused entry or custom alarm |
 | `Enter` / `Space` | Activate focused item |
 
-In the advanced settings modal:
-
-| Key | Action |
-|---|---|
-| `h` / `l` / `j` / `k` | Navigate theme cards |
-| `p` | Toggle Pomodoro mode |
-| `r` | Toggle ring visibility |
-| `q` / `Esc` / `e` | Close |
-
-Shortcuts do not trigger while typing in `input`, `textarea`, `select`, or `contenteditable` elements. `Space` and `Enter` do not override normal interaction when focus is on buttons/links.
+> [!TIP]
+> Shortcuts are disabled while typing in input fields. `Space` and `Enter` don't override button clicks.
 
 ## Push Notifications
 
-Available in Advanced settings. When enabled, the browser will ask for permission. On timer completion, a system notification is shown with the session result (focus → "Break time!", break → "Focus time!"). Requires the page to be served over HTTPS or localhost.
+Toggle **Push notifications** in Advanced settings. The first time you enable it, the browser will ask for permission. On session completion, a system notification shows whether it's time for a break or the next focus round.
+
+Requires the page to be served over HTTPS or localhost.
 
 ## History
 
-- `Clear` button in the side panel header removes all history
-- History is grouped by days (tabs)
-- Each day shows `Morning`, `Afternoon`, `Evening` blocks
-- Only `focus` time is counted for day/block totals
-- Click or `Enter` on a focus session applies that duration to the timer
+- Sessions are recorded automatically with duration, type, and timestamp
+- Grouped by day, partitioned into Morning / Afternoon / Evening
+- Click a past session to re-apply its duration to the timer
+- Use the **Clear** button to erase all history
 
-## Main Structure
+## Project Structure
 
-- `index.html`: main UI and style shell
-- `src/main.ts`: main module (timer, global keyboard, lazy loading)
-- `src/state.ts`: global state and time utilities
-- `src/ring.ts`: ring logic and rAF animation
-- `src/timerCore.ts`: timer start/pause/resume/stop flow
-- `src/uiBindings.ts`: UI rendering and event bindings
-- `src/keyboard.ts`: global shortcuts and vim-style menu navigation
-- `src/shortcuts.ts`: keyboard shortcuts help dialog
-- `src/storage.ts`: localStorage + IndexedDB + serialization
-- `src/lazyModules.ts`: lazy loading for history/audio
-- `src/historyMenu.ts`: lazy history module (days/blocks)
-- `src/audioEngine.ts`: lazy alarm sound module
-- `src/audioTrim.ts`: audio file trimming for custom alarms
-- `src/dom.ts`: typed DOM element references
-- `src/types.ts`: TypeScript type definitions
-- `src/appShell.ts`: full HTML template string
-- `dist/src/*.js`: compiled output used by `index.html`
-- `sw.js`: Service Worker for cache/offline
-- `sw.ts`: TypeScript source for the Service Worker
-- `manifest.json`: installable PWA manifest
+```
+├── index.html              # Single HTML shell
+├── manifest.json           # PWA manifest
+├── sw.ts / sw.js           # Service Worker (cache/offline)
+├── philosophy.md           # Product philosophy
+└── src/
+    ├── main.ts             # Entry point
+    ├── state.ts            # Global state
+    ├── timerCore.ts        # Timer logic
+    ├── uiBindings.ts       # UI rendering & events
+    ├── keyboard.ts         # Shortcuts & menu navigation
+    ├── shortcuts.ts        # Help dialog
+    ├── ring.ts             # SVG ring animation
+    ├── appShell.ts         # HTML template
+    ├── storage.ts          # localStorage + IndexedDB
+    ├── audioEngine.ts      # Web Audio API alarms
+    ├── audioTrim.ts        # Audio trimming for custom alarms
+    ├── historyMenu.ts      # History panel
+    ├── lazyModules.ts      # Lazy loading
+    ├── dom.ts              # Typed DOM references
+    └── types.ts            # TypeScript definitions
+```
+
+## Tech Stack
+
+- **Language:** TypeScript (strict mode)
+- **Runtime:** Browser (ES2022 modules)
+- **Storage:** localStorage + IndexedDB
+- **Audio:** Web Audio API
+- **Build:** `tsc` only — no bundlers, no frameworks
+- **Dependencies:** Zero runtime dependencies
