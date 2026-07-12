@@ -189,11 +189,14 @@ async function init(): Promise<void> {
     isHistoryOpen: () => dom.histWrap.classList.contains("open"),
     isSettingsOpen: () => dom.settingsPanel.classList.contains("open"),
     isAdvancedOpen: () => dom.advancedOverlay.classList.contains("open"),
+    isShortcutsOpen: () =>
+      document.getElementById("shortcuts-overlay")?.classList.contains("open") ?? false,
     toggleHistory: ui.toggleHistory,
     toggleSettings: ui.toggleSettings,
     closeHistory: ui.closeHistory,
     closeSettings: ui.closeSettings,
     closeAdvanced: ui.closeAdvanced,
+    closeShortcuts: () => shortcuts.close(),
     getHistoryApi,
     getSettingsItems: () =>
       Array.from(

@@ -7,11 +7,13 @@ interface KeyboardDeps {
   isHistoryOpen: () => boolean;
   isSettingsOpen: () => boolean;
   isAdvancedOpen: () => boolean;
+  isShortcutsOpen: () => boolean;
   toggleHistory: () => Promise<void>;
   toggleSettings: () => void;
   closeHistory: () => void;
   closeSettings: () => void;
   closeAdvanced: () => void;
+  closeShortcuts: () => void;
   getHistoryApi: () => HistoryApi | null;
   getSettingsItems: () => HTMLElement[];
   onStartPauseResume: () => void;
@@ -262,6 +264,14 @@ export function setupKeyboard(deps: KeyboardDeps): void {
       return;
     }
 
+    if (deps.isShortcutsOpen()) {
+      if (e.key === "Escape" || e.key.toLowerCase() === "q") {
+        e.preventDefault();
+        deps.closeShortcuts();
+        return;
+      }
+    }
+
     const menu = activeMenu();
     const lowerKey = e.key.toLowerCase();
     const isMenuNavKey =
@@ -357,6 +367,7 @@ export function setupKeyboard(deps: KeyboardDeps): void {
       deps.closeSettings();
       deps.closeHistory();
       deps.closeAdvanced();
+      deps.closeShortcuts();
     }
   });
 }
