@@ -18,6 +18,7 @@ interface KeyboardDeps {
   onStop: () => void;
   onToggleTimeEdit: () => void;
   onToggleShowRing: () => void;
+  onToggleTimerMode: () => void;
   onOpenAdvanced: () => void;
   onDeleteFocusedCustomAlarm: () => boolean;
   onCycleTheme: () => void;
@@ -84,7 +85,7 @@ export function setupKeyboard(deps: KeyboardDeps): void {
   }
 
   function moveMenuFocus(kind: "history" | "settings", dir: -1 | 1): void {
-    const allItems = menuItems(kind).filter((el) => !el.hasAttribute("disabled"));
+    const allItems = menuItems(kind).filter((el) => !el.hasAttribute("disabled") && el.offsetWidth > 0);
     if (!allItems.length) return;
 
     if (kind === "settings") {
@@ -146,7 +147,7 @@ export function setupKeyboard(deps: KeyboardDeps): void {
         return true;
       }
       if (kind === "settings") {
-        const settingsItems = menuItems("settings").filter((el) => !el.hasAttribute("disabled"));
+        const settingsItems = menuItems("settings").filter((el) => !el.hasAttribute("disabled") && el.offsetWidth > 0);
         if (moveAlarmChipHorizontal(settingsItems, -1)) return true;
       }
       moveMenuFocus(kind, -1);
@@ -164,7 +165,7 @@ export function setupKeyboard(deps: KeyboardDeps): void {
         return true;
       }
       if (kind === "settings") {
-        const settingsItems = menuItems("settings").filter((el) => !el.hasAttribute("disabled"));
+        const settingsItems = menuItems("settings").filter((el) => !el.hasAttribute("disabled") && el.offsetWidth > 0);
         if (moveAlarmChipHorizontal(settingsItems, 1)) return true;
       }
       moveMenuFocus(kind, 1);
@@ -235,6 +236,16 @@ export function setupKeyboard(deps: KeyboardDeps): void {
 
     if (deps.isAdvancedOpen()) {
       const lower = e.key.toLowerCase();
+      if ((lower === "q" || e.key === "Escape") && !e.repeat) {
+        e.preventDefault();
+        deps.closeAdvanced();
+        return;
+      }
+      if (lower === "p" && !e.repeat) {
+        e.preventDefault();
+        deps.onToggleTimerMode();
+        return;
+      }
       if (lower === "r" && !e.repeat) {
         e.preventDefault();
         deps.onToggleShowRing();
@@ -270,7 +281,7 @@ export function setupKeyboard(deps: KeyboardDeps): void {
     if (deps.hasTypingFocus(e.target) && !(menu && !e.repeat && isMenuNavKey) && !allowInTypingFocus) return;
 
     if (menu && !e.repeat) {
-      if (e.key === "Escape") {
+      if (e.key === "Escape" || lowerKey === "q") {
         e.preventDefault();
         deps.closeHistory();
         deps.closeSettings();
@@ -312,6 +323,12 @@ export function setupKeyboard(deps: KeyboardDeps): void {
       return;
     }
 
+    if (key === "p" && !e.repeat) {
+      e.preventDefault();
+      deps.onToggleTimerMode();
+      return;
+    }
+
     if (key === "e" && !e.repeat) {
       e.preventDefault();
       deps.onOpenAdvanced();
@@ -330,13 +347,13 @@ export function setupKeyboard(deps: KeyboardDeps): void {
       return;
     }
 
-    if ((e.key === "," || key === "p") && !e.repeat) {
+    if ((e.key === "," || key === "s") && !e.repeat) {
       e.preventDefault();
       deps.toggleSettings();
       return;
     }
 
-    if (e.key === "Escape") {
+    if (e.key === "Escape" || lowerKey === "q") {
       deps.closeSettings();
       deps.closeHistory();
       deps.closeAdvanced();

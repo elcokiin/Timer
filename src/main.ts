@@ -174,6 +174,7 @@ async function init(): Promise<void> {
     onStop: () => timer.stopTimer(),
     onToggleTimeEdit: () => ui.toggleTimeEdit(),
     onToggleShowRing: () => ui.toggleShowRing(),
+    onToggleTimerMode: () => ui.toggleTimerMode(),
     onCycleTheme: () => ui.cycleTheme(),
     onOpenAdvanced: () => ui.openAdvanced(),
     onDeleteFocusedCustomAlarm: () => ui.deleteFocusedCustomAlarm(),
