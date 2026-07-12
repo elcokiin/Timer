@@ -53,6 +53,7 @@ export interface DomRefs {
   settingsBtn: HTMLButtonElement;
   settingsPanel: HTMLElement;
   advancedBtn: HTMLButtonElement;
+  shortcutsBtn: HTMLButtonElement;
   advancedOverlay: HTMLElement;
   advancedDialog: HTMLElement;
   advancedClose: HTMLButtonElement;

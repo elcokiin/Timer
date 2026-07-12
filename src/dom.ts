@@ -21,6 +21,7 @@ export function getDomRefs(): DomRefs {
     settingsBtn: byId<HTMLButtonElement>("settings-btn"),
     settingsPanel: byId<HTMLElement>("settings-panel"),
     advancedBtn: byId<HTMLButtonElement>("advanced-btn"),
+    shortcutsBtn: byId<HTMLButtonElement>("shortcuts-btn"),
     advancedOverlay: byId<HTMLElement>("advanced-overlay"),
     advancedDialog: byId<HTMLElement>("advanced-dialog"),
     advancedClose: byId<HTMLButtonElement>("advanced-close"),

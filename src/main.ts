@@ -9,6 +9,7 @@ import {
 } from "./lazyModules.js";
 import { createRing } from "./ring.js";
 import { setupShortcutsDialog } from "./shortcuts.js";
+import type { ShortcutsApi } from "./shortcuts.js";
 import { state } from "./state.js";
 import {
   stripFileExtension,
@@ -34,6 +35,7 @@ const dom = getDomRefs();
 const ring = createRing(state, dom);
 
 let ui: UiApi;
+let shortcuts: ShortcutsApi;
 
 function createAlarmId(): string {
   if ("randomUUID" in crypto) return crypto.randomUUID();
@@ -165,7 +167,7 @@ function registerServiceWorker(): void {
 }
 
 async function init(): Promise<void> {
-  setupShortcutsDialog();
+  shortcuts = setupShortcutsDialog();
   ring.setupRing();
   loadPrefs(state);
   if (state.notificationsEnabled) {
@@ -177,6 +179,8 @@ async function init(): Promise<void> {
   ring.setRingImmediate(ring.ringFrac());
   ui.renderButtons();
   ui.bindUiEvents();
+
+  dom.shortcutsBtn.addEventListener("click", () => shortcuts.open());
 
   setupKeyboard({
     state,

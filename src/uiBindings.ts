@@ -370,6 +370,7 @@ export function createUiBindings(deps: UiDeps): UiApi {
       "#def-focus",
       "#def-break",
       "#apply-defaults",
+      "#shortcuts-btn",
       "#advanced-btn",
     ].join(",");
 

@@ -76,6 +76,10 @@ const APP_SHELL = `
     </div>
     <div class="settings-sep"></div>
     <div class="settings-section">
+      <button class="file-btn" id="shortcuts-btn">Keyboard shortcuts</button>
+    </div>
+    <div class="settings-sep"></div>
+    <div class="settings-section">
       <button class="file-btn" id="advanced-btn">Advanced settings</button>
     </div>
   </div>

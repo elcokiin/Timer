@@ -1,4 +1,9 @@
-export function setupShortcutsDialog(): void {
+export interface ShortcutsApi {
+  open: () => void;
+  close: () => void;
+}
+
+export function setupShortcutsDialog(): ShortcutsApi {
   const overlay = document.createElement("div");
   overlay.id = "shortcuts-overlay";
   overlay.setAttribute("aria-hidden", "true");
@@ -54,10 +59,8 @@ export function setupShortcutsDialog(): void {
       e.preventDefault();
       if (isOpen()) close();
       else open();
-    } else if ((e.key === "Escape" || e.key.toLowerCase() === "q") && isOpen() && !e.repeat) {
-      // Don't prevent default, let keyboard.ts also catch it to close other things if needed,
-      // or we can prevent default so only one thing closes.
-      close();
     }
   });
+
+  return { open, close };
 }
