@@ -1,4 +1,4 @@
-const CACHE = "focusflow-v5";
+const CACHE = "focusflow-v6";
 const ASSETS = [
   "./",
   "./index.html",
@@ -10,6 +10,7 @@ const ASSETS = [
   "./dist/src/audioEngine.js",
   "./icons/icon-192.svg",
   "./icons/icon-512.svg",
+  "./favicon.svg",
 ];
 
 self.addEventListener("install", (e: Event) => {

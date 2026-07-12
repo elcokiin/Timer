@@ -243,6 +243,7 @@ body {
   background-size: cover;
   background-position: center;
   transition: background 0.8s ease;
+  contain: layout paint;
 }
 
 #bg::after {
@@ -258,6 +259,7 @@ body {
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
+  contain: layout paint;
 }
 
 .bg-art-svg {
@@ -1085,6 +1087,7 @@ body[data-show-ring="false"] #ticks-svg {
   transform-origin: center;
   animation: ringPulse 2.8s ease-in-out infinite;
   animation-play-state: paused;
+  will-change: stroke-dashoffset;
 }
 
 #timer-wrap.ring-running #ring-progress {

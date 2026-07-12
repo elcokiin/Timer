@@ -94,8 +94,10 @@ ui = createUiBindings({
   onApplyDefaults: (focusMinutes, breakMinutes) => {
     if (state.status !== "idle") return;
     state.lastFocus = focusMinutes * 60;
-    state.lastBreak = breakMinutes * 60;
-    if (state.phase === "focus") {
+    if (state.timerMode !== "focus-only") {
+      state.lastBreak = breakMinutes * 60;
+    }
+    if (state.phase === "focus" || state.timerMode === "focus-only") {
       state.totalSeconds = state.lastFocus;
       state.remaining = state.lastFocus;
     } else {

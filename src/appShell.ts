@@ -59,6 +59,7 @@ const APP_SHELL = `
       <input type="file" id="alarm-input" accept="audio/*" />
     </div>
     <div class="settings-sep"></div>
+    <div class="settings-sep"></div>
     <div class="settings-section">
       <label>Default duration</label>
       <div class="settings-row">
@@ -66,7 +67,7 @@ const APP_SHELL = `
         <input id="def-focus" class="settings-num" type="number" min="1" max="120" value="25" />
         <span class="settings-unit">min</span>
       </div>
-      <div class="settings-row settings-row--mt6">
+      <div class="settings-row settings-row--mt6" id="break-row">
         <span class="settings-unit">Break</span>
         <input id="def-break" class="settings-num" type="number" min="1" max="60" value="5" />
         <span class="settings-unit">min</span>
@@ -116,6 +117,18 @@ const APP_SHELL = `
         </div>
       </div>
       <div class="advanced-section">
+        <label class="advanced-switch" for="timer-mode-switch">
+          <span class="advanced-switch-copy">
+            <span class="advanced-switch-title">Pomodoro mode</span>
+            <span class="advanced-switch-desc" id="timer-mode-desc">Focus + Break cycles</span>
+          </span>
+          <span class="advanced-switch-track">
+            <input id="timer-mode-switch" type="checkbox" checked />
+            <span class="advanced-switch-thumb"></span>
+          </span>
+        </label>
+      </div>
+      <div class="advanced-section">
         <label class="advanced-switch" for="advanced-show-ring">
           <span class="advanced-switch-copy">
             <span class="advanced-switch-title">Show animated ring</span>
@@ -156,7 +169,12 @@ const APP_SHELL = `
         <span id="phase-label">FOCUS</span>
         <div id="time-display">25:00</div>
         <input id="time-edit" type="text" maxlength="5" placeholder="MM:SS" />
-        <div class="btn-row" id="btn-row"></div>
+        <div class="btn-row" id="btn-row">
+          <button class="btn btn-primary" id="main-btn" data-btn-state="start" style="display:none"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>Start to Focus</button>
+          <button class="btn btn-ghost" id="pause-btn" data-btn-state="pause" style="display:none">Pause</button>
+          <button class="btn btn-primary" id="cont-btn" data-btn-state="resume" style="display:none"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>Continue</button>
+          <button class="btn btn-danger" id="stop-btn" data-btn-state="stop" style="display:none">Stop</button>
+        </div>
       </div>
     </div>
   </div>

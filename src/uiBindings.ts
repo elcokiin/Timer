@@ -176,33 +176,38 @@ export function createUiBindings(deps: UiDeps): UiApi {
       : '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>';
   }
 
+  const mainBtn = document.getElementById("main-btn") as HTMLButtonElement;
+  const pauseBtn = document.getElementById("pause-btn") as HTMLButtonElement;
+  const contBtn = document.getElementById("cont-btn") as HTMLButtonElement;
+  const stopBtn = document.getElementById("stop-btn") as HTMLButtonElement;
+  const modeDesc = document.getElementById("timer-mode-desc") as HTMLElement;
+
   function render() {
     dom.timeDisplay.textContent = fmt(state.remaining);
-    dom.phaseLabel.textContent = state.phase === "focus" ? "FOCUS" : "BREAK";
+    const isFocusOnly = state.timerMode === "focus-only";
+    dom.phaseLabel.textContent = isFocusOnly || state.phase === "focus" ? "FOCUS" : "BREAK";
     document.body.dataset.theme = state.theme;
-    document.body.dataset.phase = state.phase;
+    document.body.dataset.phase = isFocusOnly ? "focus" : state.phase;
     document.body.dataset.showRing = state.showRing ? "true" : "false";
-    document.title = `${fmt(state.remaining)} - ${state.phase === "focus" ? "Focus" : "Break"} · FocusFlow`;
+    const phaseText = isFocusOnly || state.phase === "focus" ? "Focus" : "Break";
+    document.title = `${fmt(state.remaining)} - ${phaseText} · FocusFlow`;
     updateRunningClass();
   }
 
   function renderButtons() {
-    dom.btnRow.innerHTML = "";
-    if (state.status === "idle") {
-      const lbl = state.phase === "focus" ? "Start to Focus" : "Start Break";
-      dom.btnRow.innerHTML = `<button class="btn btn-primary" id="main-btn"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>${lbl}</button>`;
-      const btn = document.getElementById("main-btn") as HTMLButtonElement | null;
-      btn?.addEventListener("click", deps.onStartTimer);
-    } else if (state.status === "running") {
-      dom.btnRow.innerHTML = `<button class="btn btn-ghost" id="pause-btn">Pause</button>`;
-      const btn = document.getElementById("pause-btn") as HTMLButtonElement | null;
-      btn?.addEventListener("click", deps.onPauseTimer);
-    } else {
-      dom.btnRow.innerHTML = `<button class="btn btn-primary" id="cont-btn"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>Continue</button><button class="btn btn-danger" id="stop-btn">Stop</button>`;
-      const cont = document.getElementById("cont-btn") as HTMLButtonElement | null;
-      const stop = document.getElementById("stop-btn") as HTMLButtonElement | null;
-      cont?.addEventListener("click", deps.onResumeTimer);
-      stop?.addEventListener("click", deps.onStopTimer);
+    const isIdle = state.status === "idle";
+    const isRunning = state.status === "running";
+    const isPaused = state.status === "paused";
+
+    mainBtn.style.display = isIdle ? "" : "none";
+    pauseBtn.style.display = isRunning ? "" : "none";
+    contBtn.style.display = isPaused ? "" : "none";
+    stopBtn.style.display = isPaused ? "" : "none";
+
+    if (isIdle) {
+      const isFocusOnly = state.timerMode === "focus-only";
+      const lbl = isFocusOnly || state.phase === "focus" ? "Start to Focus" : "Start Break";
+      mainBtn.lastChild!.textContent = lbl;
     }
   }
 
@@ -397,9 +402,17 @@ export function createUiBindings(deps: UiDeps): UiApi {
     return true;
   }
 
+  function syncTimerModeUi() {
+    const isPomodoro = state.timerMode === "pomodoro";
+    dom.timerModeSwitch.checked = isPomodoro;
+    dom.breakRow.style.display = isPomodoro ? "" : "none";
+    modeDesc.textContent = isPomodoro ? "Focus + Break cycles" : "Focus only, no breaks";
+  }
+
   function syncPrefsInputs() {
     dom.defFocus.value = String(Math.round(state.lastFocus / 60));
     dom.defBreak.value = String(Math.round(state.lastBreak / 60));
+    syncTimerModeUi();
     updateThemeCards();
     dom.advancedShowRing.checked = state.showRing;
     renderAlarmCustomChips();
@@ -409,6 +422,12 @@ export function createUiBindings(deps: UiDeps): UiApi {
   }
 
   function bindUiEvents() {
+    // Pre-rendered button events (wired once, not on every render)
+    mainBtn.addEventListener("click", deps.onStartTimer);
+    pauseBtn.addEventListener("click", deps.onPauseTimer);
+    contBtn.addEventListener("click", deps.onResumeTimer);
+    stopBtn.addEventListener("click", deps.onStopTimer);
+
     dom.timeDisplay.addEventListener("click", () => openTimeEdit());
     dom.timeEdit.addEventListener("blur", commitEdit);
     dom.timeEdit.addEventListener("keydown", (e) => {
@@ -566,6 +585,21 @@ export function createUiBindings(deps: UiDeps): UiApi {
       const fm = parseInt(dom.defFocus.value, 10) || 25;
       const bm = parseInt(dom.defBreak.value, 10) || 5;
       deps.onApplyDefaults(fm, bm);
+    });
+
+    dom.timerModeSwitch.addEventListener("change", () => {
+      state.timerMode = dom.timerModeSwitch.checked ? "pomodoro" : "focus-only";
+      syncTimerModeUi();
+      // If switching to focus-only while in break phase and idle, reset to focus
+      if (state.timerMode === "focus-only" && state.phase === "break" && state.status === "idle") {
+        state.phase = "focus";
+        state.totalSeconds = state.lastFocus;
+        state.remaining = state.lastFocus;
+        render();
+        ring.setRingImmediate(1);
+        renderButtons();
+      }
+      deps.onSavePrefs();
     });
 
     dom.advancedThemeCards.addEventListener("click", (e) => {

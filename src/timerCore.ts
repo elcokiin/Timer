@@ -26,7 +26,12 @@ export function createTimerCore(deps: TimerDeps): TimerApi {
   function onEnd(): void {
     void deps.playAlarmLazy();
     state.status = "idle";
-    if (state.phase === "focus") {
+    if (state.timerMode === "focus-only") {
+      // Focus-only: always reset to focus
+      state.phase = "focus";
+      state.totalSeconds = state.lastFocus;
+      state.remaining = state.lastFocus;
+    } else if (state.phase === "focus") {
       state.phase = "break";
       state.totalSeconds = state.lastBreak;
       state.remaining = state.lastBreak;

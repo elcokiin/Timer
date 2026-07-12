@@ -3,6 +3,7 @@ import type { AppState } from "./types.js";
 export const state: AppState = {
   phase: "focus",
   status: "idle",
+  timerMode: "pomodoro",
   theme: "forest",
   showRing: true,
   totalSeconds: 25 * 60,

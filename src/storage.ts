@@ -1,4 +1,4 @@
-import type { AppState, CustomAlarm, HistoryEntry } from "./types.js";
+import type { AppState, CustomAlarm, HistoryEntry, TimerMode } from "./types.js";
 
 interface Prefs {
   alarm?: string;
@@ -6,6 +6,7 @@ interface Prefs {
   lastBreak?: number;
   theme?: string;
   showRing?: boolean;
+  timerMode?: TimerMode;
 }
 
 function parseJson<T>(raw: string | null, fallback: T): T {
@@ -39,6 +40,7 @@ export function savePrefs(state: AppState): void {
       lastBreak: state.lastBreak,
       theme: state.theme,
       showRing: state.showRing,
+      timerMode: state.timerMode,
     })
   );
 }
@@ -48,6 +50,7 @@ export function loadPrefs(state: AppState): void {
   if (p.alarm) state.alarmChoice = p.alarm;
   if (p.theme) state.theme = p.theme;
   if (typeof p.showRing === "boolean") state.showRing = p.showRing;
+  if (p.timerMode === "pomodoro" || p.timerMode === "focus-only") state.timerMode = p.timerMode;
   if (p.lastFocus) {
     state.lastFocus = p.lastFocus;
     state.totalSeconds = p.lastFocus;
@@ -56,11 +59,18 @@ export function loadPrefs(state: AppState): void {
   if (p.lastBreak) state.lastBreak = p.lastBreak;
 }
 
+let cachedDB: IDBDatabase | null = null;
+
 function openDB(): Promise<IDBDatabase> {
+  if (cachedDB) return Promise.resolve(cachedDB);
   return new Promise((resolve, reject) => {
     const req = indexedDB.open("focusflow", 1);
     req.onupgradeneeded = () => req.result.createObjectStore("kv");
-    req.onsuccess = () => resolve(req.result);
+    req.onsuccess = () => {
+      cachedDB = req.result;
+      cachedDB.onclose = () => { cachedDB = null; };
+      resolve(cachedDB);
+    };
     req.onerror = () => reject(req.error);
   });
 }

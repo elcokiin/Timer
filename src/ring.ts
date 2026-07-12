@@ -26,6 +26,7 @@ export function createRing(state: AppState, dom: DomRefs): RingApi {
   const ring: RingRuntime = { startFrac: 1, endFrac: 1, epochStart: 0, rafId: null };
 
   function drawTicks() {
+    if (dom.ticksSvg.children.length > 0) return;
     const n = 60;
     const oR = RADIUS + SW * 2.2;
     const iR = RADIUS + SW * 4.8;
@@ -69,13 +70,18 @@ export function createRing(state: AppState, dom: DomRefs): RingApi {
     return state.totalSeconds > 0 ? state.remaining / state.totalSeconds : 0;
   }
 
+  let lastOffset: string | null = null;
   function rafLoop() {
     ring.rafId = requestAnimationFrame((ts) => {
       ring.rafId = null;
       if (state.status !== "running") return;
       const t = Math.min((ts - ring.epochStart) / 1000, 1);
       const frac = ring.startFrac + (ring.endFrac - ring.startFrac) * t;
-      dom.ringProg.setAttribute("stroke-dashoffset", String(CIRC * (1 - frac)));
+      const offset = String(CIRC * (1 - frac));
+      if (offset !== lastOffset) {
+        dom.ringProg.setAttribute("stroke-dashoffset", offset);
+        lastOffset = offset;
+      }
       rafLoop();
     });
   }

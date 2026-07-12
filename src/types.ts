@@ -1,5 +1,6 @@
 export type Phase = "focus" | "break";
 export type TimerStatus = "idle" | "running" | "paused";
+export type TimerMode = "pomodoro" | "focus-only";
 
 export interface CustomAlarm {
   id: string;
@@ -10,6 +11,7 @@ export interface CustomAlarm {
 export interface AppState {
   phase: Phase;
   status: TimerStatus;
+  timerMode: TimerMode;
   theme: string;
   showRing: boolean;
   totalSeconds: number;
@@ -66,7 +68,9 @@ export interface DomRefs {
   alarmGrid: HTMLElement;
   defFocus: HTMLInputElement;
   defBreak: HTMLInputElement;
+  breakRow: HTMLElement;
   applyDefaults: HTMLButtonElement;
+  timerModeSwitch: HTMLInputElement;
   advancedThemeCards: HTMLElement;
   advancedShowRing: HTMLInputElement;
   bgArt: HTMLElement;
