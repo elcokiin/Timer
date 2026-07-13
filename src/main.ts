@@ -209,6 +209,7 @@ async function init(): Promise<void> {
     onToggleTimeEdit: () => ui.toggleTimeEdit(),
     onToggleShowRing: () => ui.toggleShowRing(),
     onToggleTimerMode: () => ui.toggleTimerMode(),
+    onToggleNotifications: () => ui.toggleNotifications(),
     onCycleTheme: () => ui.cycleTheme(),
     onOpenAdvanced: () => ui.openAdvanced(),
     onDeleteFocusedCustomAlarm: () => ui.deleteFocusedCustomAlarm(),

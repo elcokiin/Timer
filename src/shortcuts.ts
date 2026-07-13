@@ -20,6 +20,7 @@ export function setupShortcutsDialog(): ShortcutsApi {
         <div class="shortcut-row"><span class="key">i</span><span>Edit time</span></div>
         <div class="shortcut-row"><span class="key">r</span><span>Toggle ring visibility</span></div>
         <div class="shortcut-row"><span class="key">p</span><span>Toggle Pomodoro mode</span></div>
+        <div class="shortcut-row"><span class="key">n</span><span>Toggle push notifications</span></div>
         <div class="shortcut-row"><span class="key">d</span><span>Cycle theme / Delete item</span></div>
         <div class="shortcut-row"><span class="key">H</span><span>Toggle history</span></div>
         <div class="shortcut-row"><span class="key">e</span><span>Advanced settings</span></div>

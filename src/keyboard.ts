@@ -21,6 +21,7 @@ interface KeyboardDeps {
   onToggleTimeEdit: () => void;
   onToggleShowRing: () => void;
   onToggleTimerMode: () => void;
+  onToggleNotifications: () => void;
   onOpenAdvanced: () => void;
   onDeleteFocusedCustomAlarm: () => boolean;
   onCycleTheme: () => void;
@@ -253,6 +254,11 @@ export function setupKeyboard(deps: KeyboardDeps): void {
         deps.onToggleShowRing();
         return;
       }
+      if (lower === "n" && !e.repeat) {
+        e.preventDefault();
+        deps.onToggleNotifications();
+        return;
+      }
       if (lower === "e" && !e.repeat) {
         e.preventDefault();
         deps.closeAdvanced();
@@ -336,6 +342,12 @@ export function setupKeyboard(deps: KeyboardDeps): void {
     if (key === "p" && !e.repeat) {
       e.preventDefault();
       deps.onToggleTimerMode();
+      return;
+    }
+
+    if (key === "n" && !e.repeat) {
+      e.preventDefault();
+      deps.onToggleNotifications();
       return;
     }
 

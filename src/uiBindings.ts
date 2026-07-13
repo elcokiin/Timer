@@ -38,6 +38,7 @@ export interface UiApi {
   bindUiEvents: () => void;
   toggleShowRing: () => void;
   toggleTimerMode: () => void;
+  toggleNotifications: () => void;
   deleteFocusedCustomAlarm: () => boolean;
   cycleTheme: () => void;
 }
@@ -112,6 +113,11 @@ export function createUiBindings(deps: UiDeps): UiApi {
   function toggleTimerMode() {
     dom.timerModeSwitch.checked = !dom.timerModeSwitch.checked;
     dom.timerModeSwitch.dispatchEvent(new Event("change"));
+  }
+
+  function toggleNotifications() {
+    dom.advancedNotifications.checked = !dom.advancedNotifications.checked;
+    dom.advancedNotifications.dispatchEvent(new Event("change"));
   }
 
   const themes: string[] = ["forest", "ocean", "sunset", "mono", "amber", "graphite"];
@@ -674,6 +680,7 @@ export function createUiBindings(deps: UiDeps): UiApi {
     bindUiEvents,
     toggleShowRing,
     toggleTimerMode,
+    toggleNotifications,
     deleteFocusedCustomAlarm,
     cycleTheme,
   };

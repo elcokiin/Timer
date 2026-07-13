@@ -146,7 +146,7 @@ const APP_SHELL = `
       <div class="advanced-section">
         <label class="advanced-switch" for="advanced-notifications">
           <span class="advanced-switch-copy">
-            <span class="advanced-switch-title">Push notifications</span>
+            <span class="advanced-switch-title">Push notifications <kbd>n</kbd></span>
             <span class="advanced-switch-desc">Notify when timer ends</span>
           </span>
           <span class="advanced-switch-track">
