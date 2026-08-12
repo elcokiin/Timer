@@ -1,4 +1,4 @@
-const CACHE = "focusflow-v7";
+const CACHE = "focusflow-v8";
 const ASSETS = [
   "./",
   "./index.html",
@@ -6,17 +6,41 @@ const ASSETS = [
   "./src/styles/app.css",
   "./dist/src/main.js",
   "./dist/src/appShell.js",
-  "./dist/src/historyMenu.js",
   "./dist/src/audioEngine.js",
+  "./dist/src/audioTrim.js",
+  "./dist/src/dom.js",
+  "./dist/src/historyMenu.js",
+  "./dist/src/keyboard.js",
+  "./dist/src/lazyModules.js",
+  "./dist/src/ring.js",
+  "./dist/src/shortcuts.js",
+  "./dist/src/state.js",
+  "./dist/src/storage.js",
+  "./dist/src/timerCore.js",
+  "./dist/src/types.js",
+  "./dist/src/uiBindings.js",
   "./icons/icon-192.svg",
   "./icons/icon-512.svg",
   "./favicon.svg",
 ];
 
+async function precacheAssets(cache: Cache): Promise<void> {
+  await Promise.all(
+    ASSETS.map(async (url) => {
+      try {
+        const res = await fetch(url);
+        if (res.ok) await cache.put(url, res);
+      } catch {
+        // best-effort: never let a single asset abort the install
+      }
+    })
+  );
+}
+
 self.addEventListener("install", (e: Event) => {
   const ev = e as Event & { waitUntil: (p: Promise<unknown>) => void };
   ev.waitUntil(
-    caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => {
+    caches.open(CACHE).then((c) => precacheAssets(c)).then(() => {
       const sw = self as unknown as ServiceWorkerGlobalScope;
       return sw.skipWaiting();
     })
